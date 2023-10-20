@@ -1,4 +1,4 @@
-package com.byt3.byaudio.view;
+package com.byt3.byaudio.controller;
 
 import androidx.appcompat.app.AppCompatActivity;
 
