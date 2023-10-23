@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">ByAudio</string>
+    <string name="audio_app">ByAudio</string>
+    <string name="splash_text">seamless experience</string>
+    <string name="bnav_discovery">Discovery</string>
+    <string name="bnav_player">Player</string>
+    <string name="bnav_queue">Queue</string>
+    <string name="bnav_search">Search</string>
+    <string name="bnav_playlist">Playlist</string>
 </resources>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_queue"
+        android:icon="@drawable/ic_bnav_queue"
+        android:title="@string/bnav_queue" />
+
+    <item
+        android:id="@+id/nav_player"
+        android:icon="@drawable/ic_bnav_player"
+        android:title="@string/bnav_player" />
+
+    <item
+        android:id="@+id/nav_discovery"
+        android:icon="@drawable/ic_bnav_discovery"
+        android:title="@string/bnav_discovery" />
+
+    <item
+        android:id="@+id/nav_search"
+        android:icon="@drawable/ic_bnav_search"
+        android:title="@string/bnav_search" />
+
+    <item
+        android:id="@+id/nav_playlist"
+        android:icon="@drawable/ic_bnav_playlist"
+        android:title="@string/bnav_playlist" />
+</menu>
