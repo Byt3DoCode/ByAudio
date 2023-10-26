@@ -7,4 +7,11 @@
     <string name="bnav_queue">Queue</string>
     <string name="bnav_search">Search</string>
     <string name="bnav_playlist">Playlist</string>
+    <string name="text_test_audio_time">5:10:00</string>
+    <string name="text_default_song_name">Song Name Place Holder</string>
+    <string name="text_default_artist_name">ByAudio</string>
+    <string name="button_song_detail_description">Info</string>
+    <string name="slider_description">slider</string>
+    <string name="imageView_albumCover_description">No Album Cover</string>
+    <string name="button_player_controller_description">media player controller</string>
 </resources>
