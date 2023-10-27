@@ -82,56 +82,56 @@
         app:layout_constraintTop_toBottomOf="@id/songDetail"
         android:contentDescription="@string/slider_description" />
 
-    <com.google.android.material.button.MaterialButton
+    <ImageButton
         android:id="@+id/pausePlay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="?attr/materialIconButtonStyle"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/icon_pause_64"
+        android:scaleType="fitXY"
         app:layout_constraintTop_toBottomOf="@id/slider"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:icon="@drawable/icon_info_24"
         android:contentDescription="@string/button_player_controller_description"/>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/jumpForward"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="?attr/materialIconButtonStyle"
+    <ImageButton
+        android:id="@+id/fastForward"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/icon_fast_forward_64"
+        android:scaleType="fitXY"
         app:layout_constraintTop_toTopOf="@id/pausePlay"
         app:layout_constraintLeft_toRightOf="@id/pausePlay"
-        app:icon="@drawable/icon_info_24"
         android:contentDescription="@string/button_player_controller_description"/>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/jumpBackward"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="?attr/materialIconButtonStyle"
+    <ImageButton
+        android:id="@+id/fastRewind"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/icon_fast_rewind_64"
+        android:scaleType="fitXY"
         app:layout_constraintTop_toTopOf="@id/pausePlay"
         app:layout_constraintRight_toLeftOf="@id/pausePlay"
-        app:icon="@drawable/icon_info_24"
         android:contentDescription="@string/button_player_controller_description"/>
 
-    <com.google.android.material.button.MaterialButton
+    <ImageButton
         android:id="@+id/nextSong"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="?attr/materialIconButtonStyle"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/icon_skip_next_48"
+        android:scaleType="fitXY"
         app:layout_constraintTop_toTopOf="@id/pausePlay"
-        app:layout_constraintLeft_toRightOf="@id/jumpForward"
-        app:icon="@drawable/icon_info_24"
+        app:layout_constraintLeft_toRightOf="@id/fastForward"
         android:contentDescription="@string/button_player_controller_description"/>
 
-    <com.google.android.material.button.MaterialButton
+    <ImageButton
         android:id="@+id/previousSong"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="?attr/materialIconButtonStyle"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/icon_skip_previous_64"
+        android:scaleType="fitXY"
         app:layout_constraintTop_toTopOf="@id/pausePlay"
-        app:layout_constraintRight_toLeftOf="@id/jumpBackward"
-        app:icon="@drawable/icon_info_24"
+        app:layout_constraintRight_toLeftOf="@id/fastRewind"
         android:contentDescription="@string/button_player_controller_description"/>
 
 
