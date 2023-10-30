@@ -1,48 +1,75 @@
 package com.byt3.byaudio.controller;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.byt3.byaudio.R;
+import com.byt3.byaudio.controller.adapter.ViewPagerAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
+    BottomNavigationView bottomNavigationView;
+    ViewPager2 viewPager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        viewPager = findViewById(R.id.viewpager);
 
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(this, 5);
+        viewPager.setAdapter(adapter);
+        viewPager.setUserInputEnabled(true);
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                HandleItem(item);
-                return true;
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
             }
+            @Override
+            public void onPageSelected(int position) {
+                switch (position){
+                    case 0:
+                        bottomNavigationView.getMenu().findItem(R.id.nav_queue).setChecked(true);
+                        break;
+                    case 1:
+                        bottomNavigationView.getMenu().findItem(R.id.nav_player).setChecked(true);
+                        break;
+                    case 2:
+                        bottomNavigationView.getMenu().findItem(R.id.nav_discovery).setChecked(true);
+                        break;
+                    case 3:
+                        bottomNavigationView.getMenu().findItem(R.id.nav_search).setChecked(true);
+                        break;
+                    case 4:
+                        bottomNavigationView.getMenu().findItem(R.id.nav_playlist).setChecked(true);
+                }
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                super.onPageScrollStateChanged(state);
+            }
+        });
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            HandleItem(item);
+            return true;
         });
     }
 
     private void HandleItem(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_discovery:
-                //viewPager.setCurrentItem(1);
-                break;
-            case R.id.nav_player:
-                //viewPager.setCurrentItem(2);
-                break;
-            case R.id.nav_playlist:
-                //viewPager.setCurrentItem(3);
-                break;
-            case R.id.nav_queue:
-                //viewPager.setCurrentItem(4);
-                break;
-            case R.id.nav_search:
-                //viewPager.setCurrentItem(5);
-                break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.nav_queue) {
+            viewPager.setCurrentItem(0);
+        } else if (itemId == R.id.nav_player) {
+            viewPager.setCurrentItem(1);
+        } else if (itemId == R.id.nav_discovery) {
+            viewPager.setCurrentItem(2);
+        } else if (itemId == R.id.nav_search) {
+            viewPager.setCurrentItem(3);
+        } else if (itemId == R.id.nav_playlist) {
+            viewPager.setCurrentItem(4);
         }
     }
 }

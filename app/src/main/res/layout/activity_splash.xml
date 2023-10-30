@@ -12,11 +12,9 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <ImageView
             android:layout_width="@dimen/define_dimen_150"
             android:layout_height="@dimen/define_dimen_150"
-            app:civ_border_color="@color/gray"
-            app:civ_border_width="3dp"
             android:src="@drawable/ic_cat" />
 
         <LinearLayout
