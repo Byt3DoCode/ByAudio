@@ -1,10 +1,13 @@
 package com.byt3.byaudio.controller.fragment;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -20,6 +23,7 @@ import com.byt3.byaudio.R;
 import com.byt3.byaudio.utils.functions;
 
 public class PlayerFragment extends Fragment {
+    public static final String CHANNEL_ID = "1001";
     ImageView albumCover;
     TextView songName, artistName, currentTime, totalDuration;
     SeekBar seekBar;
@@ -32,19 +36,24 @@ public class PlayerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_player, container, false);
         initView(view);
         Context context = getContext();
-
         player = MediaPlayer.create(context, R.raw.lemminofirecracker);
+        player.start();
         player.setLooping(true);
         currentTime.post(mUpdateTime);
-        totalDuration.setText(player.getDuration());
+        totalDuration.setText(functions.milliSecondsToTimer(player.getDuration()));
 
         pausePlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(player.isPlaying())
+                if (player == null)
+                    player = MediaPlayer.create(context, R.raw.lemminofirecracker);
+                if(player.isPlaying()){
                     player.pause();
-                else
+                    pausePlay.setImageResource(R.drawable.icon_play_arrow_64);
+                } else{
                     player.start();
+                    pausePlay.setImageResource(R.drawable.icon_pause_64);
+                }
             }
         });
 
@@ -54,12 +63,26 @@ public class PlayerFragment extends Fragment {
                 player.getCurrentPosition();
             }
         });
+        if (player != null){
+            seekBar.setMax(player.getDuration());
+            startPlayProgressUpdater();
+        }
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if(player != null && b){
+                    player.seekTo(i * 1000);
+                }
+            }
 
-        seekBar.setMax(player.getDuration());
-        seekBar.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                UpdateseekChange(v);
-                return false;
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
 
@@ -69,7 +92,8 @@ public class PlayerFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        player.release();
+        if (player != null)
+            player.release();
     }
 
     private void initView(View view) {
@@ -104,10 +128,27 @@ public class PlayerFragment extends Fragment {
         currentTime.setText(s);
     }
 
-    private void UpdateseekChange(View v){
-        if(player.isPlaying()){
-            SeekBar sb = (SeekBar)v;
-            player.seekTo(sb.getProgress());
+    public void startPlayProgressUpdater() {
+        seekBar.setProgress(player.getCurrentPosition());
+
+        if (player.isPlaying()) {
+            Runnable notification = new Runnable() {
+                public void run() {
+                    startPlayProgressUpdater();
+                }
+            };
+            seekBar.postDelayed(notification,1000);
+        }
+    }
+
+    private void createNotificationChannel(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel serviceChannel = new NotificationChannel(CHANNEL_ID,"Player Service", NotificationManager.IMPORTANCE_DEFAULT);
+            Context context = getContext();
+            if(context != null){
+                NotificationManager manager = context.getSystemService(NotificationManager.class);
+                manager.createNotificationChannel(serviceChannel);
+            }
         }
     }
 }
