@@ -1,32 +1,35 @@
 package com.byt3.byaudio.model;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
 import java.io.Serializable;
 
+@Entity(foreignKeys = {@ForeignKey(entity = Artist.class, parentColumns = "id", childColumns = "artistId", onDelete = ForeignKey.CASCADE),
+        @ForeignKey(entity = Album.class, parentColumns = "id", childColumns = "albumId", onDelete = ForeignKey.CASCADE),
+        @ForeignKey(entity = Folder.class, parentColumns = "id", childColumns = "folderId", onDelete = ForeignKey.CASCADE)})
 public class Song implements Serializable {
+    @PrimaryKey(autoGenerate = true)
     int id;
+    @ColumnInfo(name = "song_name")
     String name;
-    String album;
-    String artist;
+    @ColumnInfo(name = "song_duration")
     int duration;
-    String location;
+    int albumId;
+    int artistId;
+    int folderId;
+    @Ignore
+    Folder folder;
+    @Ignore
+    Album album;
+    @Ignore
+    Artist artist;
 
-    public int getImage() {
-        return image;
-    }
 
-    public void setImage(int image) {
-        this.image = image;
-    }
-
-    int image;
-
-    public Song(int id, String name, String album, String artist, int duration, String location) {
-        this.id = id;
-        this.name = name;
-        this.album = album;
-        this.artist = artist;
-        this.duration = duration;
-        this.location = location;
+    public Song() {
     }
 
     public int getId() {
@@ -45,22 +48,6 @@ public class Song implements Serializable {
         this.name = name;
     }
 
-    public String getAlbum() {
-        return album;
-    }
-
-    public void setAlbum(String album) {
-        this.album = album;
-    }
-
-    public String getArtist() {
-        return artist;
-    }
-
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
     public int getDuration() {
         return duration;
     }
@@ -69,11 +56,51 @@ public class Song implements Serializable {
         this.duration = duration;
     }
 
-    public String getLocation() {
-        return location;
+    public int getAlbumId() {
+        return albumId;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setAlbumId(int albumId) {
+        this.albumId = albumId;
+    }
+
+    public int getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(int artistId) {
+        this.artistId = artistId;
+    }
+
+    public int getFolderId() {
+        return folderId;
+    }
+
+    public void setFolderId(int folderId) {
+        this.folderId = folderId;
+    }
+
+    public Folder getFolder() {
+        return folder;
+    }
+
+    public void setFolder(Folder folder) {
+        this.folder = folder;
+    }
+
+    public Album getAlbum() {
+        return album;
+    }
+
+    public void setAlbum(Album album) {
+        this.album = album;
+    }
+
+    public Artist getArtist() {
+        return artist;
+    }
+
+    public void setArtist(Artist artist) {
+        this.artist = artist;
     }
 }

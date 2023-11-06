@@ -47,7 +47,7 @@ public class SongRecyclerAdapter extends RecyclerView.Adapter<SongViewHolder> {
 //            Picasso.get().load(s.getImage()).into(holder.albumCover);
 //        }
         holder.songName.setText(s.getName());
-        holder.artistName.setText(s.getArtist());
+//        holder.artistName.setText(s.getArtist());
         holder.songLength.setText(s.getDuration());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

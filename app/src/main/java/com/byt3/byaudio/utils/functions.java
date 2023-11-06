@@ -26,4 +26,18 @@ public class functions {
         // return timer string
         return finalTimerString;
     }
+
+    public static Boolean checkFolderName(String fileName){
+        String lowerCased = fileName.toLowerCase();
+        if (fileName.startsWith("com.") || fileName.startsWith("."))
+            return false;
+        if (lowerCased.contains("song") ||
+                lowerCased.contains("sound") ||
+                lowerCased.contains("music") ||
+                lowerCased.contains("download") ||
+                lowerCased.contains("audio") ||
+                lowerCased.contains("mp3"))
+            return true;
+        return false;
+    }
 }

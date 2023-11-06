@@ -7,37 +7,40 @@ import androidx.room.PrimaryKey;
 import java.io.Serializable;
 
 @Entity
-public class Folder implements Serializable {
+public class Album implements Serializable {
     @PrimaryKey(autoGenerate = true)
-    private int id;
-    @ColumnInfo(name = "folder_name")
-    private String name;
-    @ColumnInfo(name = "folder_path")
-    private String path;
+    int id;
+    @ColumnInfo(name = "album_name")
+    String name;
+    @ColumnInfo(name = "album_cover")
+    int image;
 
-    public Folder() {
-    }
-    public Folder(String name, String path) {
+    public Album(String name, int image) {
         this.name = name;
-        this.path = path;
+        this.image = image;
     }
 
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
     }
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
-    public String getPath() {
-        return path;
+
+    public int getImage() {
+        return image;
     }
-    public void setPath(String path) {
-        this.path = path;
+
+    public void setImage(int image) {
+        this.image = image;
     }
 }

@@ -5,6 +5,7 @@
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <application
+        android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -25,5 +26,6 @@
             android:name=".controller.MainActivity"
             android:exported="true">
         </activity>
+<!--        <service android:name=".controller.service.PlayerService" android:foregroundServiceType="mediaPlayback"/>-->
     </application>
 </manifest>
