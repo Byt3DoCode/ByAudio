@@ -21,9 +21,11 @@ import androidx.room.Room;
 
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.model.AppDatabase;
+import com.byt3.byaudio.model.Folder;
 import com.byt3.byaudio.model.dbhandler.FolderDAO;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,17 +35,19 @@ public class SplashActivity extends AppCompatActivity {
     private static final String RequiredPermission = android.Manifest.permission.READ_EXTERNAL_STORAGE;
     List<String> myList = new ArrayList<>();
     List<String> folderName = new ArrayList<>();
+    List<Folder> folderList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        HandlePermission();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        updateDB();
+        HandlePermission();
+//        updateDB();
+        firstRuntimeDataPopulate(Environment.getExternalStorageDirectory());
     }
 
     private void nextActivity() {
@@ -54,34 +58,67 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void updateDB(){
-        AppDatabase db = Room.databaseBuilder(
-                getApplicationContext(),
-                AppDatabase.class,
-                "database")
-                .build();
-        FolderDAO folderDAO = db.folderDAO();
+        int permissionCheck = ContextCompat.checkSelfPermission(this, RequiredPermission);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED){
+            AppDatabase db = Room.databaseBuilder(
+                            getApplicationContext(),
+                            AppDatabase.class,
+                            "database")
+                    .build();
+            FolderDAO folderDAO = db.folderDAO();
+            List<Folder> folders = folderDAO.getAll();
+            for (Folder f : folders){
+                File file = new File(f.getPath());
+                try {
+                    if (f.getSize() == file.listFiles().length){
+                        file.getCanonicalPath();
+                    }
+                } catch (NullPointerException e){
+                    Log.e("MyLog","Folder "+f.getName()+" is empty, deleting...");
 
-        File file = Environment.getExternalStorageDirectory();
-        filterFolder(file);
-        System.out.println(folderName);
-        if (myList!=null)
-            System.out.println(myList.size());
+                } catch (IOException e) {
+                    Log.e("MyLog", "file IOE");
+                    throw new RuntimeException(e);
+                }
+            }
+
+            System.out.println(folderName);
+            if (myList!=null)
+                System.out.println(myList.size());
+        }
     }
-    private void filterFolder(File file){
+    private void firstRuntimeDataPopulate(File file){
         File[] list = file.listFiles();
         if (list != null){
             for (File f : list){
-                if (checkFolderName(f.getName()))
-                    searchValidFolder(f, f.getName());
+                if (checkFolderName(f.getName())) {
+                    try {
+                        searchValidFolder(f, f.getName());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+        if (folderList != null){
+            AppDatabase db = Room.databaseBuilder(
+                            getApplicationContext(),
+                            AppDatabase.class,
+                            "database")
+                    .build();
+            FolderDAO folderDAO = db.folderDAO();
+            for (Folder f : folderList){
+                Log.d("MyLog", f.getName()+" "+f.getSize()+" "+f.getPath());
+                db.folderDAO().insertAll(f);
             }
         }
     }
-    private void searchValidFolder(File file, String directory){
+    private void searchValidFolder(File file, String directory) throws IOException {
         File[] list = file.listFiles();
         boolean folderFound = false;
         File mFile = null;
         String directoryName = "";
-
+        int counter = 0;
         if (list != null) {
             for (File value : list) {
                 mFile = new File(file, value.getName());
@@ -90,24 +127,27 @@ public class SplashActivity extends AppCompatActivity {
                     searchValidFolder(mFile, directoryName);
                 } else {
                     if (value.getName().toLowerCase().endsWith(".mp3")) {
+                        ++counter;
                         myList.add(value.getName());
                         folderFound = true;
                     }
                 }
             }
         }
-        if (folderFound)
-            folderName.add(directory);
+        if (folderFound){
+            folderList.add(new Folder(directory, file.getCanonicalPath(), counter));
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d("amir", "onRequestPermissionsResult: called");
+        Log.d("MyLog", "onRequestPermissionsResult: called");
         if (requestCode == REQUEST_PERMISSION_READING_STATE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(SplashActivity.this, "Permission Granted!", Toast.LENGTH_SHORT).show();
+//                firstRuntimeDataPopulate(Environment.getExternalStorageDirectory());
                 Handler handler = new Handler();
                 handler.postDelayed(this::nextActivity, 2000);
             } else {

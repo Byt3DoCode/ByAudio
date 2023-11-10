@@ -14,12 +14,13 @@ public class Folder implements Serializable {
     private String name;
     @ColumnInfo(name = "folder_path")
     private String path;
+    @ColumnInfo(name = "folder_size")
+    private int size;
 
-    public Folder() {
-    }
-    public Folder(String name, String path) {
+    public Folder(String name, String path, int size) {
         this.name = name;
         this.path = path;
+        this.size = size;
     }
 
     public int getId() {
@@ -39,5 +40,13 @@ public class Folder implements Serializable {
     }
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 }

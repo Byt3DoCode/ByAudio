@@ -31,13 +31,11 @@ public class functions {
         String lowerCased = fileName.toLowerCase();
         if (fileName.startsWith("com.") || fileName.startsWith("."))
             return false;
-        if (lowerCased.contains("song") ||
+        return lowerCased.contains("song") ||
                 lowerCased.contains("sound") ||
                 lowerCased.contains("music") ||
                 lowerCased.contains("download") ||
                 lowerCased.contains("audio") ||
-                lowerCased.contains("mp3"))
-            return true;
-        return false;
+                lowerCased.contains("mp3");
     }
 }
