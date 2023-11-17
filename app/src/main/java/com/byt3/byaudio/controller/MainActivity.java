@@ -8,11 +8,19 @@ import android.view.MenuItem;
 
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.adapter.ViewPagerAdapter;
+import com.byt3.byaudio.model.AppDatabase;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     ViewPager2 viewPager;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,13 +40,13 @@ public class MainActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 switch (position){
                     case 0:
-                        bottomNavigationView.getMenu().findItem(R.id.nav_queue).setChecked(true);
+                        bottomNavigationView.getMenu().findItem(R.id.nav_discovery).setChecked(true);
                         break;
                     case 1:
                         bottomNavigationView.getMenu().findItem(R.id.nav_player).setChecked(true);
                         break;
                     case 2:
-                        bottomNavigationView.getMenu().findItem(R.id.nav_discovery).setChecked(true);
+                        bottomNavigationView.getMenu().findItem(R.id.nav_queue).setChecked(true);
                         break;
                     case 3:
                         bottomNavigationView.getMenu().findItem(R.id.nav_search).setChecked(true);
@@ -53,23 +61,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            HandleItem(item);
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_discovery) {
+                viewPager.setCurrentItem(0);
+            } else if (itemId == R.id.nav_player) {
+                viewPager.setCurrentItem(1);
+            } else if (itemId == R.id.nav_queue) {
+                viewPager.setCurrentItem(2);
+            } else if (itemId == R.id.nav_search) {
+                viewPager.setCurrentItem(3);
+            } else if (itemId == R.id.nav_playlist) {
+                viewPager.setCurrentItem(4);
+            }
             return true;
         });
-    }
-
-    private void HandleItem(MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == R.id.nav_queue) {
-            viewPager.setCurrentItem(0);
-        } else if (itemId == R.id.nav_player) {
-            viewPager.setCurrentItem(1);
-        } else if (itemId == R.id.nav_discovery) {
-            viewPager.setCurrentItem(2);
-        } else if (itemId == R.id.nav_search) {
-            viewPager.setCurrentItem(3);
-        } else if (itemId == R.id.nav_playlist) {
-            viewPager.setCurrentItem(4);
-        }
     }
 }

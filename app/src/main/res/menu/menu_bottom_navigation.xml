@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/nav_queue"
-        android:icon="@drawable/ic_bnav_queue"
-        android:title="@string/bnav_queue" />
+        android:id="@+id/nav_discovery"
+        android:icon="@drawable/ic_bnav_discovery"
+        android:title="@string/bnav_discovery" />
 
     <item
         android:id="@+id/nav_player"
@@ -12,9 +12,9 @@
         android:title="@string/bnav_player" />
 
     <item
-        android:id="@+id/nav_discovery"
-        android:icon="@drawable/ic_bnav_discovery"
-        android:title="@string/bnav_discovery" />
+        android:id="@+id/nav_queue"
+        android:icon="@drawable/ic_bnav_queue"
+        android:title="@string/bnav_queue" />
 
     <item
         android:id="@+id/nav_search"

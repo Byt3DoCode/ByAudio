@@ -29,15 +29,16 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position){
             case 0:
-                return new QueueDetailFragment();
+                return new DiscoveryFragment();
             case 1:
                 return new PlayerFragment();
+            case 2:
+                return new QueueDetailFragment();
             case 3:
                 return new SearchLocalFragment();
             case 4:
                 return new PlaylistMenuFragment();
-            default:
-                return new DiscoveryFragment();
         }
+        return new DiscoveryFragment();
     }
 }

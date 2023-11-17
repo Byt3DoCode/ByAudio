@@ -4,23 +4,31 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
+
+import com.byt3.byaudio.model.dbhandler.ArtistDAO;
 
 import java.io.Serializable;
 
-@Entity(foreignKeys = {@ForeignKey(entity = Artist.class, parentColumns = "id", childColumns = "artistId", onDelete = ForeignKey.CASCADE),
-        @ForeignKey(entity = Album.class, parentColumns = "id", childColumns = "albumId", onDelete = ForeignKey.CASCADE),
-        @ForeignKey(entity = Folder.class, parentColumns = "id", childColumns = "folderId", onDelete = ForeignKey.CASCADE)})
+@Entity(foreignKeys = {@ForeignKey(entity = Artist.class, parentColumns = "artistId", childColumns = "sArtistId", onDelete = ForeignKey.CASCADE),
+        @ForeignKey(entity = Album.class, parentColumns = "albumId", childColumns = "sAlbumId", onDelete = ForeignKey.CASCADE),
+        @ForeignKey(entity = Folder.class, parentColumns = "folderId", childColumns = "sFolderId", onDelete = ForeignKey.CASCADE)},
+        indices = {
+                @Index("sArtistId"),
+                @Index("sAlbumId"),
+                @Index(value = {"sFolderId", "song_name"}, unique = true)
+        })
 public class Song implements Serializable {
     @PrimaryKey(autoGenerate = true)
-    int id;
+    int songId;
     @ColumnInfo(name = "song_name")
     String name;
     @ColumnInfo(name = "song_duration")
     int duration;
-    int albumId;
-    int artistId;
-    int folderId;
+    public int sAlbumId;
+    public int sArtistId;
+    public int sFolderId;
     @Ignore
     Folder folder;
     @Ignore
@@ -28,16 +36,20 @@ public class Song implements Serializable {
     @Ignore
     Artist artist;
 
-
     public Song() {
     }
-
-    public int getId() {
-        return id;
+    @Ignore
+    public Song(String name, Folder folder){
+        this.name = name;
+        this.folder = folder;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getSongId() {
+        return songId;
+    }
+
+    public void setSongId(int songId) {
+        this.songId = songId;
     }
 
     public String getName() {
@@ -56,28 +68,28 @@ public class Song implements Serializable {
         this.duration = duration;
     }
 
-    public int getAlbumId() {
-        return albumId;
+    public int getsAlbumId() {
+        return sAlbumId;
     }
 
-    public void setAlbumId(int albumId) {
-        this.albumId = albumId;
+    public void setsAlbumId(int sAlbumId) {
+        this.sAlbumId = sAlbumId;
     }
 
-    public int getArtistId() {
-        return artistId;
+    public int getsArtistId() {
+        return sArtistId;
     }
 
-    public void setArtistId(int artistId) {
-        this.artistId = artistId;
+    public void setsArtistId(int sArtistId) {
+        this.sArtistId = sArtistId;
     }
 
-    public int getFolderId() {
-        return folderId;
+    public int getsFolderId() {
+        return sFolderId;
     }
 
-    public void setFolderId(int folderId) {
-        this.folderId = folderId;
+    public void setsFolderId(int sFolderId) {
+        this.sFolderId = sFolderId;
     }
 
     public Folder getFolder() {

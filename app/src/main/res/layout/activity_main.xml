@@ -29,9 +29,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         android:background="@color/gray"
-        app:itemIconTint="@color/mint"
+        app:itemIconTint="@drawable/navigation_view_colored"
         app:itemTextColor="@color/mint"
         app:labelVisibilityMode="unlabeled"
+        app:itemActiveIndicatorStyle="@style/ShapeAppearance.Material3.NavigationBarView.ActiveIndicator"
         app:menu="@menu/menu_bottom_navigation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

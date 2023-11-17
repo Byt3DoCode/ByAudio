@@ -1,0 +1,223 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "089d575ac3870abfbfb1ec70239e6fc3",
+    "entities": [
+      {
+        "tableName": "Folder",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`folderId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `folder_name` TEXT, `folder_path` TEXT, `folder_size` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "folderId",
+            "columnName": "folderId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "folder_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "folder_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "size",
+            "columnName": "folder_size",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "folderId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Song",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`songId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `song_name` TEXT, `song_duration` INTEGER NOT NULL, `sAlbumId` INTEGER NOT NULL, `sArtistId` INTEGER NOT NULL, `sFolderId` INTEGER NOT NULL, FOREIGN KEY(`sArtistId`) REFERENCES `Artist`(`artistId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`sAlbumId`) REFERENCES `Album`(`albumId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`sFolderId`) REFERENCES `Folder`(`folderId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "songId",
+            "columnName": "songId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "song_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "song_duration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sAlbumId",
+            "columnName": "sAlbumId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sArtistId",
+            "columnName": "sArtistId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sFolderId",
+            "columnName": "sFolderId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "songId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_Song_sArtistId",
+            "unique": false,
+            "columnNames": [
+              "sArtistId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Song_sArtistId` ON `${TABLE_NAME}` (`sArtistId`)"
+          },
+          {
+            "name": "index_Song_sAlbumId",
+            "unique": false,
+            "columnNames": [
+              "sAlbumId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Song_sAlbumId` ON `${TABLE_NAME}` (`sAlbumId`)"
+          },
+          {
+            "name": "index_Song_sFolderId_song_name",
+            "unique": true,
+            "columnNames": [
+              "sFolderId",
+              "song_name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Song_sFolderId_song_name` ON `${TABLE_NAME}` (`sFolderId`, `song_name`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Artist",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sArtistId"
+            ],
+            "referencedColumns": [
+              "artistId"
+            ]
+          },
+          {
+            "table": "Album",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sAlbumId"
+            ],
+            "referencedColumns": [
+              "albumId"
+            ]
+          },
+          {
+            "table": "Folder",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sFolderId"
+            ],
+            "referencedColumns": [
+              "folderId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "Artist",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`artistId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artist_name` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "artistId",
+            "columnName": "artistId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "artist_name",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "artistId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Album",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`albumId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `album_name` TEXT, `album_cover` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "albumId",
+            "columnName": "albumId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "album_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image",
+            "columnName": "album_cover",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "albumId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '089d575ac3870abfbfb1ec70239e6fc3')"
+    ]
+  }
+}

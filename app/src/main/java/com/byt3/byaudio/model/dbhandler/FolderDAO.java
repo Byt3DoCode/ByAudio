@@ -6,6 +6,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
+import androidx.room.Upsert;
 
 import com.byt3.byaudio.model.Folder;
 
@@ -21,5 +22,8 @@ public interface FolderDAO {
     void delete(Folder folder);
     @Query("SELECT * FROM Folder")
     List<Folder> getAll();
-
+    @Query("SELECT * FROM Folder WHERE folderId = :id")
+    Folder getFolderById(int id);
+    @Query("SELECT * FROM Folder WHERE folder_path = :path")
+    Folder getFolderByPath(String path);
 }

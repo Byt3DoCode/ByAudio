@@ -2,6 +2,7 @@ package com.byt3.byaudio.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -9,7 +10,7 @@ import java.io.Serializable;
 @Entity
 public class Folder implements Serializable {
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private int folderId;
     @ColumnInfo(name = "folder_name")
     private String name;
     @ColumnInfo(name = "folder_path")
@@ -17,17 +18,25 @@ public class Folder implements Serializable {
     @ColumnInfo(name = "folder_size")
     private int size;
 
+    public Folder() {}
+
+    @Ignore
+    public Folder(String path) {
+        this.path = path;
+    }
+
+    @Ignore
     public Folder(String name, String path, int size) {
         this.name = name;
         this.path = path;
         this.size = size;
     }
 
-    public int getId() {
-        return id;
+    public int getFolderId() {
+        return folderId;
     }
-    public void setId(int id) {
-        this.id = id;
+    public void setFolderId(int folderId) {
+        this.folderId = folderId;
     }
     public String getName() {
         return name;
