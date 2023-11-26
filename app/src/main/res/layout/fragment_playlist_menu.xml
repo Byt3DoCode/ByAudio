@@ -5,20 +5,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/gray">
+
     <Button
         android:id="@+id/btnFavorite"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:padding="16dp"
+        android:layout_margin="@dimen/define_dimen_8"
+        android:paddingHorizontal="@dimen/define_dimen_16"
         android:text="Favorites"
         android:textAllCaps="false"
-        android:textColor="@color/mint"
-        android:background="@color/gray"
-        android:drawableStart="@drawable/icon_favorite_24"
-        android:drawableTint="@color/mint"
-        android:textSize="24sp"/>
+        android:textColor="@color/white"
+        android:background="@drawable/round_btn"
+        android:drawableStart="@drawable/ic_favorite_24"
+        android:drawableTint="@color/white"
+        android:textSize="20sp"/>
 
     <Button
         android:id="@+id/btnFolder"
@@ -26,21 +28,27 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/btnFavorite"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:padding="16dp"
+        android:layout_margin="@dimen/define_dimen_8"
+        android:paddingHorizontal="@dimen/define_dimen_16"
         android:text="Folders"
         android:textAllCaps="false"
-        android:textColor="@color/mint"
+        android:textColor="@color/white"
         android:background="@drawable/round_btn"
-        android:drawableStart="@drawable/icon_folder_24"
-        android:drawableTint="@color/mint"
-        android:textSize="24sp"/>
+        android:drawableStart="@drawable/ic_folder_24"
+        android:drawableTint="@color/white"
+        android:textSize="20sp"/>
 
-    <View
+    <TextView
         android:id="@+id/border"
         android:layout_width="match_parent"
-        android:layout_height="4dp"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/btnFolder"
         app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="@dimen/define_dimen_8"
+        android:text="Playlists"
+        android:textColor="@color/gray"
+        android:textSize="20sp"
+        android:textAlignment="center"
         android:background="@color/mint" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -50,6 +58,6 @@
         app:layout_constraintTop_toBottomOf="@+id/border"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="5dp"
-        tools:listitem="@layout/item_song"
+        tools:listitem="@layout/item_playlist"
         tools:itemCount="3"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

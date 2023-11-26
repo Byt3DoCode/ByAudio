@@ -4,7 +4,10 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <application
+        android:name=".controller.ByAudioApplication"
         android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -24,8 +27,21 @@
         </activity>
         <activity
             android:name=".controller.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTop">
         </activity>
-<!--        <service android:name=".controller.service.PlayerService" android:foregroundServiceType="mediaPlayback"/>-->
+        <activity
+            android:name=".controller.FolderDetailActivity"
+            android:exported="true"
+            android:parentActivityName=".controller.MainActivity">
+        </activity>
+        <service
+            android:name=".controller.service.PlayerService"
+            android:foregroundServiceType="mediaPlayback"
+            android:stopWithTask="true">
+        </service>
+        <receiver
+            android:name=".controller.service.ActionReceiver">
+        </receiver>
     </application>
 </manifest>

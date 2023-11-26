@@ -1,14 +1,16 @@
 package com.byt3.byaudio.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.io.Serializable;
-
 @Entity
-public class Album implements Serializable {
+public class Album implements Parcelable {
     @PrimaryKey(autoGenerate = true)
     int albumId;
     @ColumnInfo(name = "album_name")
@@ -28,6 +30,26 @@ public class Album implements Serializable {
         this.name = name;
         this.image = image;
     }
+
+    @Ignore
+    protected Album(Parcel in) {
+        albumId = in.readInt();
+        name = in.readString();
+        image = in.readInt();
+    }
+
+    @Ignore
+    public static final Creator<Album> CREATOR = new Creator<Album>() {
+        @Override
+        public Album createFromParcel(Parcel in) {
+            return new Album(in);
+        }
+
+        @Override
+        public Album[] newArray(int size) {
+            return new Album[size];
+        }
+    };
 
     public int getAlbumId() {
         return albumId;
@@ -51,5 +73,19 @@ public class Album implements Serializable {
 
     public void setImage(int image) {
         this.image = image;
+    }
+
+    @Ignore
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Ignore
+    @Override
+    public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeInt(albumId);
+        parcel.writeString(name);
+        parcel.writeInt(image);
     }
 }

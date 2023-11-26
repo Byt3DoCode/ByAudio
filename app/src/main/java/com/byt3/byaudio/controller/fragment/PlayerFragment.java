@@ -1,14 +1,15 @@
 package com.byt3.byaudio.controller.fragment;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
+import static com.byt3.byaudio.utils.functions.cleanName;
+import static com.byt3.byaudio.utils.functions.getBitmapFromPath;
+import static com.byt3.byaudio.utils.functions.milliSecondsToTimer;
+
+import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaMetadata;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -29,12 +30,13 @@ import androidx.fragment.app.Fragment;
 
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.service.PlayerService;
+import com.byt3.byaudio.model.Song;
 import com.byt3.byaudio.utils.functions;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class PlayerFragment extends Fragment {
-    public static final String CHANNEL_ID = "1001";
     ImageView albumCover;
     TextView songName, artistName, currentTime, totalDuration;
     SeekBar seekBar;
@@ -42,11 +44,13 @@ public class PlayerFragment extends Fragment {
     MediaPlayer player;
     Context context;
     Intent intent;
+    private Song song;
+    boolean isPlaying;
+
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        context = getContext();
-//        createNotificationChannel();
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
     }
 
     @Nullable
@@ -55,13 +59,24 @@ public class PlayerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_player, container, false);
         initView(view);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            try {
-                displaySongInfo();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        Bundle bundle = getArguments();
+        if (bundle != null){
+//            song = (Song) Objects.requireNonNull(bundle.getParcelableArrayList("songs")).get(bundle.getInt("index"));
+            isPlaying = true;
+            intent = new Intent(context,PlayerService.class);
+//            seekBar.setMax(song.getDuration()*1000);
+//            startPlayProgressUpdater();
+            intent.putExtra("newList", true);
+            intent.putExtra("index", bundle.getInt("index"));
+            intent.putExtra("songs", bundle.getParcelableArrayList("songs"));
+            context.startService(intent);
         }
+
+//        try {
+//            displaySongInfo();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
 //        player = MediaPlayer.create(context, R.raw.lemminofirecracker);
 //        player.start();
@@ -75,14 +90,18 @@ public class PlayerFragment extends Fragment {
         pausePlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (player == null)
-                    player = MediaPlayer.create(context, R.raw.lemminofirecracker);
-                if(player.isPlaying()){
-                    player.pause();
-                    pausePlay.setImageResource(R.drawable.icon_play_arrow_64);
-                } else{
-                    player.start();
-                    pausePlay.setImageResource(R.drawable.icon_pause_64);
+                if (isPlaying) {
+                    isPlaying = false;
+                    pausePlay.setImageResource(R.drawable.ic_play_24);
+                    intent = new Intent(context,PlayerService.class);
+                    intent.putExtra("actionToService", PlayerService.PAUSE);
+                    context.startService(intent);
+                } else {
+                    isPlaying = true;
+                    pausePlay.setImageResource(R.drawable.ic_pause_24);
+                    intent = new Intent(context,PlayerService.class);
+                    intent.putExtra("actionToService", PlayerService.RESUME);
+                    context.startService(intent);
                 }
             }
         });
@@ -93,10 +112,7 @@ public class PlayerFragment extends Fragment {
                 player.getCurrentPosition();
             }
         });
-        if (player != null){
-            seekBar.setMax(player.getDuration());
-            startPlayProgressUpdater();
-        }
+
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -151,7 +167,7 @@ public class PlayerFragment extends Fragment {
         previousSong = view.findViewById(R.id.previousSong);
     }
 
-    private Runnable mUpdateTime = new Runnable() {
+    private final Runnable mUpdateTime = new Runnable() {
         public void run() {
             int currentDuration;
             if (player.isPlaying()) {
@@ -164,7 +180,7 @@ public class PlayerFragment extends Fragment {
         }
     };
     private void updatePlayer(int currentDuration){
-        String s = "" + functions.milliSecondsToTimer((long) currentDuration);
+        String s = "" + milliSecondsToTimer((long) currentDuration);
         currentTime.setText(s);
     }
 
@@ -181,47 +197,13 @@ public class PlayerFragment extends Fragment {
         }
     }
 
-    private void createNotificationChannel(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel serviceChannel = new NotificationChannel(CHANNEL_ID,"Player Service", NotificationManager.IMPORTANCE_DEFAULT);
-            serviceChannel.setName("ByAudio");
-            Context context = getContext();
-            if(context != null){
-                NotificationManager manager = context.getSystemService(NotificationManager.class);
-                manager.createNotificationChannel(serviceChannel);
-            }
-        }
-    }
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     private void displaySongInfo() throws IOException {
-        try (MediaMetadataRetriever mmr = new MediaMetadataRetriever()) {
-            Uri uri = new Uri.Builder()
-                    .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-                    .authority(context.getPackageName())
-                    .appendPath(String.valueOf(R.raw.lemminofirecracker))
-                    .build();
-            mmr.setDataSource(context, uri);
-
-            String temporary;
-            temporary = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            if (temporary != null)
-                songName.setText(temporary);
-            else
-                songName.setText("test");
-
-            temporary = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-            if (temporary != null)
-                artistName.setText(temporary);
-            else
-                artistName.setText("Unknown");
-
-            totalDuration.setText(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-
-            byte[] artBytes = mmr.getEmbeddedPicture();
-            if (artBytes!=null){
-                Bitmap bm = BitmapFactory.decodeByteArray(artBytes,0,artBytes.length);
-                albumCover.setImageBitmap(bm);
-            }
+        songName.setText(cleanName(song.getName()));
+        artistName.setText(song.getArtist().getName());
+        totalDuration.setText(milliSecondsToTimer(song.getDuration()* 1000L));
+        if (song.getAlbum().getImage() == 1){
+            Bitmap bm = getBitmapFromPath(song);
+            albumCover.setImageBitmap(bm);
         }
     }
 }

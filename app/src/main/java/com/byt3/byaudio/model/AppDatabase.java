@@ -23,8 +23,8 @@ import com.byt3.byaudio.model.objrelation.SongAndArtistAndAlbumAndFolder;
         Song.class,
         Artist.class,
         Album.class,
-//        SongCollection.class,
-//        CollectionSongCrossRef.class
+        SongCollection.class,
+        CollectionSongCrossRef.class
         }, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DB_NAME = "database.db";
@@ -37,7 +37,7 @@ public abstract class AppDatabase extends RoomDatabase {
         return instance;
     }
 
-    protected AppDatabase() {};
+    protected AppDatabase() {}
 
     private static AppDatabase create(final Context context) {
         return Room.databaseBuilder(
@@ -52,6 +52,6 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ArtistDAO artistDAO();
     public abstract AlbumDAO albumDAO();
     public abstract SoArAlFoDAO saafDAO();
-//    public abstract SongCollectionDAO songCollectionDAO();
-//    public abstract CoSosDAO CoSosDAO();
+    public abstract SongCollectionDAO songCollectionDAO();
+    public abstract CoSosDAO CoSosDAO();
 }

@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.byt3.byaudio.model.CollectionSongCrossRef;
 import com.byt3.byaudio.model.Song;
 import com.byt3.byaudio.model.SongCollection;
 
@@ -15,7 +16,7 @@ import java.util.List;
 @Dao
 public interface SongCollectionDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(SongCollection songCollection);
+    Long insert(SongCollection songCollection);
     @Update
     void updateCollection(SongCollection songCollection);
     @Delete
@@ -24,4 +25,6 @@ public interface SongCollectionDAO {
     SongCollection getCollectionByName(String name);
     @Query("SELECT * FROM SongCollection WHERE scType = :type")
     List<SongCollection> getCollectionByType(String type);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertCollectionSongCrossRef(CollectionSongCrossRef collectionSongCrossRef);
 }

@@ -1,14 +1,16 @@
 package com.byt3.byaudio.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.io.Serializable;
-
 @Entity
-public class Folder implements Serializable {
+public class Folder implements Parcelable {
     @PrimaryKey(autoGenerate = true)
     private int folderId;
     @ColumnInfo(name = "folder_name")
@@ -31,6 +33,27 @@ public class Folder implements Serializable {
         this.path = path;
         this.size = size;
     }
+
+    @Ignore
+    protected Folder(Parcel in) {
+        folderId = in.readInt();
+        name = in.readString();
+        path = in.readString();
+        size = in.readInt();
+    }
+
+    @Ignore
+    public static final Creator<Folder> CREATOR = new Creator<Folder>() {
+        @Override
+        public Folder createFromParcel(Parcel in) {
+            return new Folder(in);
+        }
+
+        @Override
+        public Folder[] newArray(int size) {
+            return new Folder[size];
+        }
+    };
 
     public int getFolderId() {
         return folderId;
@@ -57,5 +80,20 @@ public class Folder implements Serializable {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    @Ignore
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Ignore
+    @Override
+    public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeInt(folderId);
+        parcel.writeString(name);
+        parcel.writeString(path);
+        parcel.writeInt(size);
     }
 }

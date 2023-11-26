@@ -1,25 +1,17 @@
 package com.byt3.byaudio.controller;
 
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.os.Bundle;
-import android.view.MenuItem;
-
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.adapter.ViewPagerAdapter;
-import com.byt3.byaudio.model.AppDatabase;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     ViewPager2 viewPager;
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 4:
                         bottomNavigationView.getMenu().findItem(R.id.nav_playlist).setChecked(true);
+                        break;
                 }
             }
             @Override
@@ -63,17 +56,20 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_discovery) {
-                viewPager.setCurrentItem(0);
+                viewPager.setCurrentItem(0, false);
             } else if (itemId == R.id.nav_player) {
-                viewPager.setCurrentItem(1);
+                viewPager.setCurrentItem(1, false);
             } else if (itemId == R.id.nav_queue) {
-                viewPager.setCurrentItem(2);
+                viewPager.setCurrentItem(2, false);
             } else if (itemId == R.id.nav_search) {
-                viewPager.setCurrentItem(3);
+                viewPager.setCurrentItem(3, false);
             } else if (itemId == R.id.nav_playlist) {
-                viewPager.setCurrentItem(4);
+                viewPager.setCurrentItem(4, false);
             }
             return true;
         });
+
+        if (getIntent().getBooleanExtra("fromService", false))
+            viewPager.setCurrentItem(1);
     }
 }

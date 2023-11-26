@@ -15,7 +15,26 @@ public class CollectionWithSongs {
     @Relation(
             parentColumn = "scId",
             entityColumn = "songId",
-            associateBy = @Junction(CollectionSongCrossRef.class)
+            associateBy = @Junction(
+                    value = CollectionSongCrossRef.class,
+                    parentColumn = "crSCId",
+                    entityColumn = "crSongId")
     )
     public List<Song> songs;
+
+    public SongCollection getSongCollection() {
+        return songCollection;
+    }
+
+    public void setSongCollection(SongCollection songCollection) {
+        this.songCollection = songCollection;
+    }
+
+    public List<Song> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(List<Song> songs) {
+        this.songs = songs;
+    }
 }

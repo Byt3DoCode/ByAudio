@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "089d575ac3870abfbfb1ec70239e6fc3",
+    "identityHash": "2b478bffe4d9ae6d5a368387f8c4a794",
     "entities": [
       {
         "tableName": "Folder",
@@ -212,12 +212,125 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "SongCollection",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`scId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `scName` TEXT, `scType` TEXT, `scSize` INTEGER NOT NULL, `scTotalDuration` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "scId",
+            "columnName": "scId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scName",
+            "columnName": "scName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "scType",
+            "columnName": "scType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "scSize",
+            "columnName": "scSize",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scTotalDuration",
+            "columnName": "scTotalDuration",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "scId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_SongCollection_scName_scSize",
+            "unique": true,
+            "columnNames": [
+              "scName",
+              "scSize"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_SongCollection_scName_scSize` ON `${TABLE_NAME}` (`scName`, `scSize`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "CollectionSongCrossRef",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`crSCId` INTEGER NOT NULL, `crSongId` INTEGER NOT NULL, PRIMARY KEY(`crSCId`, `crSongId`), FOREIGN KEY(`crSCId`) REFERENCES `SongCollection`(`scId`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "crSCId",
+            "columnName": "crSCId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "crSongId",
+            "columnName": "crSongId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "crSCId",
+            "crSongId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_CollectionSongCrossRef_crSCId",
+            "unique": false,
+            "columnNames": [
+              "crSCId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_CollectionSongCrossRef_crSCId` ON `${TABLE_NAME}` (`crSCId`)"
+          },
+          {
+            "name": "index_CollectionSongCrossRef_crSongId",
+            "unique": false,
+            "columnNames": [
+              "crSongId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_CollectionSongCrossRef_crSongId` ON `${TABLE_NAME}` (`crSongId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "SongCollection",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "crSCId"
+            ],
+            "referencedColumns": [
+              "scId"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '089d575ac3870abfbfb1ec70239e6fc3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b478bffe4d9ae6d5a368387f8c4a794')"
     ]
   }
 }

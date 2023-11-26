@@ -9,13 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.byt3.byaudio.R;
-import com.byt3.byaudio.utils.ItemClickListener;
 
-public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+public class SongViewHolder extends RecyclerView.ViewHolder{
     public ImageView albumCover;
     public TextView songName, artistName, songLength;
     public ImageButton optionButton;
-    public ItemClickListener listener;
 
     public SongViewHolder(@NonNull View view) {
         super(view);
@@ -24,12 +22,5 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         artistName = view.findViewById(R.id.artistName);
         songLength = view.findViewById(R.id.songLength);
         optionButton = view.findViewById(R.id.buttonOption);
-    }
-    public void  setListener(ItemClickListener listener){
-        this.listener = listener;
-    }
-    @Override
-    public void onClick(View view) {
-        listener.onClick(view, getAdapterPosition(), false);
     }
 }

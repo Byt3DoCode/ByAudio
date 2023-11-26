@@ -1,6 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/queueDetailFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/gray">
 
+    <Button
+        android:id="@+id/queueNameBtn"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:paddingHorizontal="@dimen/define_dimen_16"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textSize="22sp"
+        android:textColor="@color/gray"
+        android:background="@color/lighterMint"
+        android:drawableEnd="@drawable/ic_keyboard_arrow_down_24"
+        android:drawableTint="@color/gray"
+        android:text="No Queue" />
+
+
+    <TextView
+        android:id="@+id/queueDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/queueNameBtn"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="@dimen/define_dimen_8"
+        android:layout_marginEnd="@dimen/define_dimen_16"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:text="0:00" />
+
+    <TextView
+        android:id="@+id/queueSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/queueDuration"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:text="0 song" />
+
+    <Button
+        android:id="@+id/buttonSave"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/fill_space"
+        app:layout_constraintTop_toBottomOf="@id/queueNameBtn"
+        app:layout_constraintBottom_toTopOf="@id/recyclerView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_margin="5dp"
+        android:textAllCaps="false"
+        android:background="@drawable/round_btn"
+        android:textColor="@color/mint"
+        android:text="save" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/fill_space"
+        app:layout_constraintTop_toBottomOf="@id/queueSize"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="@dimen/define_dimen_8"
+        tools:itemCount="4"
+        tools:listitem="@layout/item_draggable_song"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

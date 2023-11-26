@@ -8,10 +8,10 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaMetadataRetriever;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,6 +27,7 @@ import com.byt3.byaudio.model.AppDatabase;
 import com.byt3.byaudio.model.Artist;
 import com.byt3.byaudio.model.Folder;
 import com.byt3.byaudio.model.Song;
+import com.byt3.byaudio.model.SongCollection;
 import com.byt3.byaudio.model.dbhandler.AlbumDAO;
 import com.byt3.byaudio.model.dbhandler.ArtistDAO;
 import com.byt3.byaudio.model.dbhandler.FolderDAO;
@@ -164,7 +165,7 @@ public class SplashActivity extends AppCompatActivity {
             for (Folder f : folderList)
                 folderDAO.insertAll(f);
 
-        if (songList != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (songList != null) {
             try (MediaMetadataRetriever mmr = new MediaMetadataRetriever()) {
                 for (Song s : songList) {
                     mmr.setDataSource(s.getFolder().getPath() + "/" + s.getName());
@@ -210,7 +211,7 @@ public class SplashActivity extends AppCompatActivity {
 
                 firstRuntimeDataPopulate();
 
-                Handler handler = new Handler();
+                Handler handler = new Handler(Looper.getMainLooper());
                 handler.postDelayed(this::nextActivity, 2000);
             } else {
                 Toast.makeText(SplashActivity.this, "Permission Denied!", Toast.LENGTH_SHORT).show();
@@ -231,9 +232,14 @@ public class SplashActivity extends AppCompatActivity {
         else {
             Toast.makeText(SplashActivity.this, "Permission (already) Granted!", Toast.LENGTH_SHORT).show();
 
-            //updateDB();
+//            updateDB();
+            AppDatabase db = AppDatabase.getInstance(this);
+            List<SongCollection> sc = db.songCollectionDAO().getCollectionByType(SongCollection.TYPE_QUEUE);
+            for (SongCollection obj : sc) {
+                db.songCollectionDAO().delete(obj);
+            }
 
-            Handler handler = new Handler();
+            Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(this::nextActivity, 2000);
         }
     }
@@ -245,7 +251,7 @@ public class SplashActivity extends AppCompatActivity {
                 .setPositiveButton(android.R.string.ok, (dialog, id) ->
                         ActivityCompat.requestPermissions(SplashActivity.this,
                                 new String[]{SplashActivity.RequiredPermission}, 1))
-                .setNegativeButton(android.R.string.no, (dialogInterface, i) ->
+                .setNegativeButton(android.R.string.cancel, (dialogInterface, i) ->
                         SplashActivity.this.finishAffinity());
         builder.create().show();
     }

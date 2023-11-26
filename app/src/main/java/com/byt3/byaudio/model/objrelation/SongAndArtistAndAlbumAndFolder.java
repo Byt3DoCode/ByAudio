@@ -14,9 +14,9 @@ import java.util.List;
 public class SongAndArtistAndAlbumAndFolder implements Serializable {
     @Embedded public Song song;
     @Relation(parentColumn = "songId", entityColumn = "artistId", entity = Artist.class)
-    public List<Artist> artist;
+    public Artist artist;
     @Relation(parentColumn = "songId", entityColumn = "albumId", entity = Album.class)
-    public List<Album> album;
+    public Album album;
     @Relation(parentColumn = "songId", entityColumn = "folderId", entity = Folder.class)
-    public List<Folder> folder;
+    public Folder folder;
 }
