@@ -128,6 +128,7 @@ public class QueueDetailFragment extends Fragment {
                 Toast.makeText(context, "Already saved", Toast.LENGTH_SHORT).show();
             } else {
                 String newName = currentQueue.getSongCollection().getScName();
+                newName = newName.replace("Queue ", "");
                 newName = newName.replace("Search", "Playlist");
                 newName = newName.replace("Folder", "Playlist");
                 currentQueue.getSongCollection().setScType(SongCollection.TYPE_PLAYLIST);

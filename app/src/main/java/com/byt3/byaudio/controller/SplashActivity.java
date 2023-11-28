@@ -222,18 +222,6 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void HandlePermission() {
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-
         int permissionCheck = ContextCompat.checkSelfPermission(this, RequiredPermission);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED)
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, RequiredPermission))
@@ -248,9 +236,8 @@ public class SplashActivity extends AppCompatActivity {
 //            updateDB();
             AppDatabase db = AppDatabase.getInstance(this);
             List<SongCollection> sc = db.songCollectionDAO().getCollectionByType(SongCollection.TYPE_QUEUE);
-            for (SongCollection obj : sc) {
+            for (SongCollection obj : sc)
                 db.songCollectionDAO().delete(obj);
-            }
 
             Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(this::nextActivity, 2000);
