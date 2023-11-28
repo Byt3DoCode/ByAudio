@@ -21,6 +21,7 @@ public class CollectionSongCrossRef {
     public int crSCId;
     public int crSongId;
     private int crSongOrder;
+
     public CollectionSongCrossRef() {
     }
     @Ignore

@@ -21,23 +21,18 @@ public interface CoSosDAO {
     @Transaction
     @Query("SELECT * FROM SongCollection")
     List<CollectionWithSongs> getCollectionWithSongs();
-
     @Transaction
     @Query("SELECT * FROM SongCollection WHERE scId = :id")
     CollectionWithSongs getCollectionWithSongsByscId(int id);
-
     @Transaction
     @Query("SELECT * FROM SongCollection WHERE scType = :type")
     Flowable<List<CollectionWithSongs>> getCollectionWithSongsByType(String type);
-
     @Transaction
     @Delete
     void deleteCrossRef (CollectionSongCrossRef collectionSongCrossRef);
-
     @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertCollectionSongCrossRef(CollectionSongCrossRef collectionSongCrossRef);
-
     @Transaction
     @Update
     void updateCollectionSongCrossRef(CollectionSongCrossRef collectionSongCrossRef);
