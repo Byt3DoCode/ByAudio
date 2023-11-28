@@ -29,4 +29,6 @@ public interface SongDAO {
     List<String> getSongNameByFolder(int folderId);
     @Query("SELECT * FROM Song WHERE song_name like :query")
     List<Song> getSongLikeName(String query);
+    @Query("SELECT * FROM SONG LIMIT 1")
+    Song getOneSong();
 }

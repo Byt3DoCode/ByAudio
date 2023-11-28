@@ -1,17 +1,38 @@
 package com.byt3.byaudio.controller;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.adapter.ViewPagerAdapter;
+import com.byt3.byaudio.controller.service.PlayerService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     ViewPager2 viewPager;
+//    Intent serviceIntent = new Intent(this, PlayerService.class);
+//    public static PlayerService playerService;
+//    boolean isServiceConnected;
+//    ServiceConnection serviceConnection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+//            PlayerService.MyBinder binder = (PlayerService.MyBinder) iBinder;
+//            playerService = binder.getplayerService();
+//            isServiceConnected = true;
+//        }
+//        @Override
+//        public void onServiceDisconnected(ComponentName componentName) {
+//            isServiceConnected = false;
+//        }
+//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,5 +92,16 @@ public class MainActivity extends AppCompatActivity {
 
         if (getIntent().getBooleanExtra("fromService", false))
             viewPager.setCurrentItem(1);
+
+//        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        if (isServiceConnected){
+//            unbindService(serviceConnection);
+//            isServiceConnected = false;
+//        }
     }
 }

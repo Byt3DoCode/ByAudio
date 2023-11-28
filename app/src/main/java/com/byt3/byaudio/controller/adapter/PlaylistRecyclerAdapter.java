@@ -16,6 +16,7 @@ import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.FolderDetailActivity;
 import com.byt3.byaudio.controller.viewholder.PlaylistViewHolder;
 import com.byt3.byaudio.model.SongCollection;
+import com.byt3.byaudio.model.objrelation.CollectionWithSongs;
 
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
 
     public void setList(List<SongCollection> list){
         this.list = list;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -45,8 +47,9 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
     public void onBindViewHolder(@NonNull PlaylistViewHolder holder, int position) {
         SongCollection playlist = list.get(position);
         holder.plName.setText(playlist.getScName());
-        holder.plSize.setText(playlist.getScSize());
-        holder.plDuration.setText(milliSecondsToTimer(playlist.getScTotalDuration()));
+        String size = playlist.getScSize() + " songs";
+        holder.plSize.setText(size);
+        holder.plDuration.setText(milliSecondsToTimer(playlist.getScTotalDuration() * 1000L));
         holder.itemView.setOnClickListener(view -> {
             Intent intent = new Intent(context, FolderDetailActivity.class);
             intent.putExtra("playlist", playlist);

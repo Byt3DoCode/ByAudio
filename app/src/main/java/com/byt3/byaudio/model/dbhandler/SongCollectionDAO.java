@@ -5,6 +5,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import com.byt3.byaudio.model.CollectionSongCrossRef;
@@ -12,6 +13,8 @@ import com.byt3.byaudio.model.Song;
 import com.byt3.byaudio.model.SongCollection;
 
 import java.util.List;
+
+import io.reactivex.rxjava3.core.Flowable;
 
 @Dao
 public interface SongCollectionDAO {
@@ -25,6 +28,7 @@ public interface SongCollectionDAO {
     SongCollection getCollectionByName(String name);
     @Query("SELECT * FROM SongCollection WHERE scType = :type")
     List<SongCollection> getCollectionByType(String type);
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertCollectionSongCrossRef(CollectionSongCrossRef collectionSongCrossRef);
+    @Transaction
+    @Query("SELECT * FROM SongCollection WHERE scType = :type")
+    Flowable<List<SongCollection>> getCollectionByTypeRT(String type);
 }

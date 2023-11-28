@@ -2,21 +2,24 @@ package com.byt3.byaudio.controller.service;
 
 import static com.byt3.byaudio.utils.functions.CHANNEL_ID;
 import static com.byt3.byaudio.utils.functions.buildFullPath;
+import static com.byt3.byaudio.utils.functions.cleanName;
 import static com.byt3.byaudio.utils.functions.getBitmapFromPath;
 
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.IBinder;
-import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.media3.exoplayer.ExoPlayer;
 
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.MainActivity;
@@ -24,16 +27,18 @@ import com.byt3.byaudio.model.Song;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerService extends Service implements MediaPlayer.OnCompletionListener,
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
         MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener,
-        AudioManager.OnAudioFocusChangeListener{
+        AudioManager.OnAudioFocusChangeListener {
+    private final MyBinder binder = new MyBinder();
+    private boolean started = false;
     private ArrayList<Song> list;
     private int index;
-    private final boolean loopQueue = false;
+    private boolean loopQueue = false;
     private MediaPlayer mediaPlayer = null;
-
     public static final int PLAY = 0;
     public static final int PAUSE = 2;
     public static final int RESUME = 3;
@@ -45,22 +50,87 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (list == null || intent.getBooleanExtra("newList", false)){
+        started = true;
+        if (list == null || intent.getBooleanExtra("newList", false)) {
             list = intent.getParcelableArrayListExtra("songs");
             index = intent.getIntExtra("index", 0);
         }
         int action = intent.getIntExtra("actionToService", 0);
-        handleAction(action);
+        if (list != null)
+            handleAction(action);
+        //ToDo:To actively send data from a service to an activity or have an activity listen to
+        // changes in data, you can use various mechanisms such as callbacks, broadcast receivers,
+        // or event bus libraries. Here's an example using callbacks:
+        //
+        //1. Define an interface in your service class that represents the callback methods to be
+        // implemented by the activity. For example:
+        //
+        //java
+        //public interface MediaPlayerCallback {
+        //    void onSongComplete(String nextSong);
+        //}
+        //
+        //
+        //2. Implement this interface in your activity class and override the callback method. For
+        // example:
+        //
+        //java
+        //public class MainActivity extends AppCompatActivity implements MediaPlayerCallback {
+        //    // ...
+        //
+        //    @Override
+        //    public void onSongComplete(String nextSong) {
+        //        // Update the UI with the next song information
+        //        runOnUiThread(() -> {
+        //            // Display the next song in your activity
+        //        });
+        //    }
+        //}
+        //
+        //
+        //3. In your service class, create a reference to the callback interface and invoke the
+        // callback method when needed. For example:
+        //
+        //java
+        //public class MyService extends Service {
+        //    private MediaPlayerCallback callback;
+        //
+        //    // ...
+        //
+        //    public void setMediaPlayerCallback(MediaPlayerCallback callback) {
+        //        this.callback = callback;
+        //    }
+        //
+        //    private void onSongComplete(String nextSong) {
+        //        if (callback != null) {
+        //            callback.onSongComplete(nextSong);
+        //        }
+        //    }
+        //}
+        //
+        //
+        //4. When starting the service from your activity, make sure to set the callback using the
+        // `setMediaPlayerCallback()` method. For example:
+        //
+        //java
+        //MyService myService = new MyService();
+        //myService.setMediaPlayerCallback(this); // 'this' refers to the activity instance
+        //startService(intent);
+        //
+        //
+        //By implementing this approach, the service can actively send data to the activity by
+        // invoking the callback method defined in the interface. The activity will then receive the
+        // data and update its UI accordingly.
         return START_NOT_STICKY;
     }
 
     private void handleAction(int action) {
-        switch (action){
+        switch (action) {
             case PLAY:
                 playAudio();
                 break;
@@ -104,17 +174,17 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         setupNotification(list.get(index));
     }
 
-    private void pauseAudio(){
+    public void pauseAudio() {
         mediaPlayer.pause();
         setupNotification(list.get(index));
     }
 
-    private void resumeAudio(){
+    public void resumeAudio() {
         mediaPlayer.start();
         setupNotification(list.get(index));
     }
 
-    private void playNextSong(){
+    public void playNextSong() {
         if (index < list.size() - 1)
             ++index;
         else if (loopQueue)
@@ -122,7 +192,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         playAudio();
     }
 
-    private void playPreviousSong(){
+    public void playPreviousSong() {
         if (index > 0)
             --index;
         else if (loopQueue)
@@ -130,19 +200,19 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         playAudio();
     }
 
-    private void fastForward(){
-        mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 5000 ,MediaPlayer.SEEK_NEXT_SYNC);
+    public void fastForward() {
+        mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 5000, MediaPlayer.SEEK_NEXT_SYNC);
     }
 
-    private void rewind(){
+    public void rewind() {
+        mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 5000, MediaPlayer.SEEK_PREVIOUS_SYNC);
+    }
+
+    private void setLoopSong() {
 
     }
 
-    private void setLoopSong(){
-
-    }
-
-    private void setLoopQueue(){
+    private void setLoopQueue() {
 
     }
 
@@ -151,30 +221,31 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         intent.putExtra("fromService", true);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_player);
-        remoteViews.setTextViewText(R.id.songName, song.getName());
-        remoteViews.setTextViewText(R.id.artistName, song.getArtist().getName());
-        if (song.getAlbum().getImage() == 1){
-            Bitmap bitmap = getBitmapFromPath(song);
-            remoteViews.setImageViewBitmap(R.id.albumCover, bitmap);
-        }
-        if (mediaPlayer.isPlaying()){
-            remoteViews.setOnClickPendingIntent(R.id.pausePlay, buildPendingIntentAction(PAUSE));
-            remoteViews.setImageViewResource(R.id.pausePlay, R.drawable.ic_pause_24);
-        } else {
-            remoteViews.setOnClickPendingIntent(R.id.pausePlay, buildPendingIntentAction(RESUME));
-            remoteViews.setImageViewResource(R.id.pausePlay, R.drawable.ic_play_24);
-        }
-        remoteViews.setOnClickPendingIntent(R.id.nextSong, buildPendingIntentAction(NEXT));
-        remoteViews.setOnClickPendingIntent(R.id.previousSong, buildPendingIntentAction(PREVIOUS));
+        Bitmap bitmap;
+        if (song.getAlbum().getImage() == 1)
+            bitmap = getBitmapFromPath(song);
+        else
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_cat);
 
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+        NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setDefaults(0)
-                .setSmallIcon(R.drawable.icon_notification_cat)
+                .setShowWhen(false)
                 .setContentIntent(pendingIntent)
-                .setCustomContentView(remoteViews)
-                .build();
-        startForeground(1, notification);
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.icon_notification_cat)
+                .setContentTitle(cleanName(song.getName()))
+                .setContentText(song.getArtist().getName())
+                .setLargeIcon(bitmap)
+                .addAction(R.drawable.ic_previous_24, "previous", buildPendingIntentAction(PREVIOUS))
+                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                        .setShowActionsInCompactView(0, 1, 2)
+                );
+        if (mediaPlayer.isPlaying())
+            notifyBuilder.addAction(R.drawable.ic_pause_24, "pause", buildPendingIntentAction(PAUSE));
+        else
+            notifyBuilder.addAction(R.drawable.ic_play_24, "pause", buildPendingIntentAction(PAUSE));
+        notifyBuilder.addAction(R.drawable.ic_next_24, "next", buildPendingIntentAction(NEXT));
+        startForeground(1, notifyBuilder.build());
     }
 
     private PendingIntent buildPendingIntentAction(int action){
@@ -182,6 +253,21 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         intent.putExtra("actionFromService", action);
         return PendingIntent.getBroadcast(this.getApplicationContext(), action, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
+
+    public Song getSong() {
+        return list.get(index);
+    }
+    public List<Song> getList() {
+        return list;
+    }
+    public int getIndex() {
+        return index;
+    }
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+    public String test(){return "hello";}
+
     @Override
     public boolean stopService(Intent name) {
         if (mediaPlayer != null)
@@ -247,5 +333,23 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     @Override
     public void onAudioFocusChange(int i) {
 
+    }
+
+    public void setList(ArrayList<Song> songs) {
+        this.list = songs;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public boolean hasStarted(){
+        return started;
+    }
+
+    public class MyBinder extends Binder {
+        public PlayerService getplayerService(){
+            return PlayerService.this;
+        }
     }
 }

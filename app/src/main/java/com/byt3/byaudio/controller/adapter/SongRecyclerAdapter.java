@@ -1,10 +1,13 @@
 package com.byt3.byaudio.controller.adapter;
 
+import static com.byt3.byaudio.utils.functions.MY_LOGCAT;
 import static com.byt3.byaudio.utils.functions.getBitmapFromPath;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.FolderDetailActivity;
 import com.byt3.byaudio.controller.fragment.PlayerFragment;
+import com.byt3.byaudio.controller.service.PlayerService;
 import com.byt3.byaudio.controller.viewholder.SongViewHolder;
 import com.byt3.byaudio.model.AppDatabase;
 import com.byt3.byaudio.model.CollectionSongCrossRef;
@@ -32,7 +36,7 @@ public class SongRecyclerAdapter extends RecyclerView.Adapter<SongViewHolder> {
     private final Context context;
     private final Activity activity;
     private List<Song> list;
-    private String queryText, folderName;
+    private String queryText, listName;
     private final AppDatabase db;
 
     public SongRecyclerAdapter(Context context, List<Song> list, Context activityContext) {
@@ -51,8 +55,8 @@ public class SongRecyclerAdapter extends RecyclerView.Adapter<SongViewHolder> {
         this.queryText = queryText;
     }
 
-    public void setFolderName(String folderName){
-        this.folderName = folderName;
+    public void setListName(String listName){
+        this.listName = listName;
     }
 
     @NonNull
@@ -77,40 +81,36 @@ public class SongRecyclerAdapter extends RecyclerView.Adapter<SongViewHolder> {
             holder.albumCover.setBackgroundColor(context.getColor(R.color.gray));
         }
         holder.itemView.setOnClickListener(view -> {
-            String name;
-            if (context instanceof FolderDetailActivity)
-                name = "Folder"+folderName;
-            else
-                name = "Search"+queryText;
+            String name = "Queue ";
             long totalDuration = 0;
-            for (Song s : list) {
-                totalDuration += s.getDuration();
-            }
+            int count = 0;
+            if (context instanceof FolderDetailActivity)
+                name += listName;
+            else
+                name += "Search " + queryText;
             SongCollection songCollection = new SongCollection(name,
                     SongCollection.TYPE_QUEUE,
                     list.size(),
                     totalDuration);
             songCollection.setScId(Math.toIntExact(db.songCollectionDAO().insert(songCollection)));
             for (Song s : list) {
+                totalDuration += s.getDuration();
                 CollectionSongCrossRef crossRef = new CollectionSongCrossRef(
                         songCollection.getScId(),
-                        s.getSongId());
-                db.songCollectionDAO().insertCollectionSongCrossRef(crossRef);
+                        s.getSongId(),
+                        count++);
+                db.CoSosDAO().insertCollectionSongCrossRef(crossRef);
             }
+            songCollection.setScTotalDuration(totalDuration);
+            db.songCollectionDAO().updateCollection(songCollection);
 
-            ViewPager2 viewPager = activity.findViewById(R.id.viewpager);
-            viewPager.setCurrentItem(1, false);
-
-            Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList("songs", new ArrayList<>(list));
-            bundle.putInt("index", holder.getAdapterPosition());
-
-            PlayerFragment fragment = new PlayerFragment();
-            fragment.setArguments(bundle);
-            FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
-            manager.beginTransaction()
-                    .replace(R.id.playerFragment, fragment)
-                    .commit();
+            Intent intent = new Intent(context, PlayerService.class);
+            intent.putExtra("newList", true);
+            intent.putParcelableArrayListExtra("songs", new ArrayList<>(list));
+            intent.putExtra("index", holder.getAdapterPosition());
+            context.startService(intent);
+            if (context instanceof FolderDetailActivity)
+                ((FolderDetailActivity) context).finish();
         });
         holder.optionButton.setVisibility(View.GONE);
 //        holder.optionButton.setOnClickListener(view -> {

@@ -13,10 +13,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.adapter.SongRecyclerAdapter;
 import com.byt3.byaudio.model.AppDatabase;
+import com.byt3.byaudio.model.CollectionSongCrossRef;
 import com.byt3.byaudio.model.Folder;
 import com.byt3.byaudio.model.Song;
 import com.byt3.byaudio.model.SongCollection;
+import com.byt3.byaudio.model.objrelation.CollectionWithSongs;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,6 +43,10 @@ public class FolderDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         db = AppDatabase.getInstance(this);
+        adapter = new SongRecyclerAdapter(this, null, this);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
@@ -47,6 +54,7 @@ public class FolderDetailActivity extends AppCompatActivity {
             folder = bundle.getParcelable("folder");
             assert folder != null;
             toolbar.setTitle(folder.getName());
+            adapter.setListName("Folder " + folder.getName());
             String size = folder.getSize() + " songs";
             folderSize.setText(size);
             songs = db.songDAO().getSongByFolder(folder.getFolderId());
@@ -59,29 +67,21 @@ public class FolderDetailActivity extends AppCompatActivity {
             songCollection = bundle.getParcelable("playlist");
             assert songCollection != null;
             toolbar.setTitle(songCollection.getScName());
+            adapter.setListName(songCollection.getScName());
             String size = songCollection.getScSize() + " songs";
             folderSize.setText(size);
-            songs = db.CoSosDAO().getCollectionWithSongsByscId(songCollection.getScId()).getSongs();
-            for (Song s : songs) {
+            CollectionWithSongs collection = db.CoSosDAO().getCollectionWithSongsByscId(songCollection.getScId());
+            Song[] list = new Song[collection.getSongCollection().getScSize()];
+            for (int i = 0; i < collection.getCrossRefs().size(); ++i) {
+                Song s = collection.getSongs().get(i);
                 s.setAlbum(db.albumDAO().getAlbumById(s.getsAlbumId()));
                 s.setArtist(db.artistDAO().getArtistById(s.getsArtistId()));
                 s.setFolder(db.folderDAO().getFolderById(s.getsFolderId()));
+                list[collection.getCrossRefs().get(i).getCrSongOrder()] = s;
             }
+            songs = Arrays.asList(list);
         } else
-            finishAffinity();
-
-        db = AppDatabase.getInstance(this);
-        songs = db.songDAO().getSongByFolder(folder.getFolderId());
-        for (Song s : songs) {
-            s.setAlbum(db.albumDAO().getAlbumById(s.getsAlbumId()));
-            s.setArtist(db.artistDAO().getArtistById(s.getsArtistId()));
-            s.setFolder(db.folderDAO().getFolderById(s.getsFolderId()));
-        }
-
-        adapter = new SongRecyclerAdapter(this, songs, this);
-        adapter.setFolderName(folder.getName());
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+            finish();
+        adapter.setList(songs);
     }
 }

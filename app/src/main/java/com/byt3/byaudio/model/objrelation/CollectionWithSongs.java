@@ -21,6 +21,12 @@ public class CollectionWithSongs {
                     entityColumn = "crSongId")
     )
     public List<Song> songs;
+    @Relation(
+            entity = CollectionSongCrossRef.class,
+            parentColumn = "scId",
+            entityColumn = "crSCId"
+    )
+    public List<CollectionSongCrossRef> crossRefs;
 
     public SongCollection getSongCollection() {
         return songCollection;
@@ -36,5 +42,9 @@ public class CollectionWithSongs {
 
     public void setSongs(List<Song> songs) {
         this.songs = songs;
+    }
+
+    public List<CollectionSongCrossRef> getCrossRefs() {
+        return crossRefs;
     }
 }

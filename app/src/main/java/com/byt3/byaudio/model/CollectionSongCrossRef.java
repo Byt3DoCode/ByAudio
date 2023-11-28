@@ -14,19 +14,20 @@ import androidx.room.Index;
                 onDelete = ForeignKey.CASCADE,
                 onUpdate = ForeignKey.CASCADE)},
         indices = {
-                @Index("crSCId"),
+                @Index(value = {"crSCId", "crSongOrder"}, unique = true),
                 @Index("crSongId")}
 )
 public class CollectionSongCrossRef {
     public int crSCId;
     public int crSongId;
-
+    private int crSongOrder;
     public CollectionSongCrossRef() {
     }
     @Ignore
-    public CollectionSongCrossRef(int crSCId, int crSongId) {
+    public CollectionSongCrossRef(int crSCId, int crSongId, int crSongOrder) {
         this.crSCId = crSCId;
         this.crSongId = crSongId;
+        this.crSongOrder = crSongOrder;
     }
 
     public int getCrSCId() {
@@ -43,5 +44,13 @@ public class CollectionSongCrossRef {
 
     public void setCrSongId(int crSongId) {
         this.crSongId = crSongId;
+    }
+
+    public int getCrSongOrder() {
+        return crSongOrder;
+    }
+
+    public void setCrSongOrder(int crSongOrder) {
+        this.crSongOrder = crSongOrder;
     }
 }

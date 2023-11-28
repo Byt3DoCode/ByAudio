@@ -5,6 +5,11 @@ import static com.byt3.byaudio.utils.functions.CHANNEL_ID;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+
+import com.byt3.byaudio.controller.service.PlayerService;
 
 public class ByAudioApplication extends Application {
     @Override

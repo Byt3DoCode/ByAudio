@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2b478bffe4d9ae6d5a368387f8c4a794",
+    "identityHash": "f7ce56d5d8c860d421a501455ccc051e",
     "entities": [
       {
         "tableName": "Folder",
@@ -270,7 +270,7 @@
       },
       {
         "tableName": "CollectionSongCrossRef",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`crSCId` INTEGER NOT NULL, `crSongId` INTEGER NOT NULL, PRIMARY KEY(`crSCId`, `crSongId`), FOREIGN KEY(`crSCId`) REFERENCES `SongCollection`(`scId`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`crSCId` INTEGER NOT NULL, `crSongId` INTEGER NOT NULL, `crSongOrder` INTEGER NOT NULL, PRIMARY KEY(`crSCId`, `crSongId`), FOREIGN KEY(`crSCId`) REFERENCES `SongCollection`(`scId`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "crSCId",
@@ -281,6 +281,12 @@
           {
             "fieldPath": "crSongId",
             "columnName": "crSongId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "crSongOrder",
+            "columnName": "crSongOrder",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -294,13 +300,14 @@
         },
         "indices": [
           {
-            "name": "index_CollectionSongCrossRef_crSCId",
-            "unique": false,
+            "name": "index_CollectionSongCrossRef_crSCId_crSongOrder",
+            "unique": true,
             "columnNames": [
-              "crSCId"
+              "crSCId",
+              "crSongOrder"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_CollectionSongCrossRef_crSCId` ON `${TABLE_NAME}` (`crSCId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_CollectionSongCrossRef_crSCId_crSongOrder` ON `${TABLE_NAME}` (`crSCId`, `crSongOrder`)"
           },
           {
             "name": "index_CollectionSongCrossRef_crSongId",
@@ -330,7 +337,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b478bffe4d9ae6d5a368387f8c4a794')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f7ce56d5d8c860d421a501455ccc051e')"
     ]
   }
 }

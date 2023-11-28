@@ -20,11 +20,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.FolderDetailActivity;
 import com.byt3.byaudio.controller.adapter.PlaylistRecyclerAdapter;
+import com.byt3.byaudio.controller.service.PlayerService;
 import com.byt3.byaudio.model.AppDatabase;
 import com.byt3.byaudio.model.Folder;
 import com.byt3.byaudio.model.SongCollection;
+import com.byt3.byaudio.model.objrelation.CollectionWithSongs;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class PlaylistMenuFragment extends Fragment {
     Context context;
@@ -34,12 +42,14 @@ public class PlaylistMenuFragment extends Fragment {
     Button folderBtn, favoriteBtn;
     List<SongCollection> playlists;
     List<Folder> folders;
+    CompositeDisposable disposable;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
         this.db = AppDatabase.getInstance(context);
+        this.disposable = new CompositeDisposable();
     }
 
     @Nullable
@@ -48,14 +58,27 @@ public class PlaylistMenuFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_playlist_menu, container, false);
         initView(view);
 
-        playlists = db.songCollectionDAO().getCollectionByType(SongCollection.TYPE_PLAYLIST);
         folders = db.folderDAO().getAll();
 
-        playlistAdapter = new PlaylistRecyclerAdapter(context, playlists, getActivity());
+        playlistAdapter = new PlaylistRecyclerAdapter(context, null, getActivity());
         recyclerView.setAdapter(playlistAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
         favoriteBtn.setVisibility(View.GONE);
+
+        disposable.add(db.songCollectionDAO().getCollectionByTypeRT(SongCollection.TYPE_PLAYLIST)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .distinctUntilChanged()
+                .map(list -> Collections.unmodifiableList(new ArrayList<>(list)))
+                .subscribe(list -> {
+                    playlists = list;
+                    if (playlists.size()!=0){
+                        playlistAdapter.setList(playlists);
+                    }
+                }, throwable -> {
+                    throw throwable;
+                }));
 
         folderBtn.setOnClickListener(view1 -> {
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.select_dialog_item);
@@ -72,6 +95,12 @@ public class PlaylistMenuFragment extends Fragment {
             builderSingle.show();
         });
         return view;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposable.clear();
     }
 
     private void initView(View view) {
