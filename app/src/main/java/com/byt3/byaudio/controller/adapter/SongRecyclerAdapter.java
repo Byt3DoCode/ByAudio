@@ -1,27 +1,20 @@
 package com.byt3.byaudio.controller.adapter;
 
-import static com.byt3.byaudio.utils.functions.MY_LOGCAT;
 import static com.byt3.byaudio.utils.functions.getBitmapFromPath;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.FolderDetailActivity;
 import com.byt3.byaudio.controller.SongDetailActivity;
-import com.byt3.byaudio.controller.fragment.PlayerFragment;
 import com.byt3.byaudio.controller.service.PlayerService;
 import com.byt3.byaudio.controller.viewholder.SongViewHolder;
 import com.byt3.byaudio.model.AppDatabase;

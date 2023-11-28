@@ -1,13 +1,11 @@
 package com.byt3.byaudio.controller.adapter;
 
-import static com.byt3.byaudio.utils.functions.MY_LOGCAT;
 import static com.byt3.byaudio.utils.functions.cleanName;
 import static com.byt3.byaudio.utils.functions.milliSecondsToTimer;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

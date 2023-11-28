@@ -16,7 +16,6 @@ import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.FolderDetailActivity;
 import com.byt3.byaudio.controller.viewholder.PlaylistViewHolder;
 import com.byt3.byaudio.model.SongCollection;
-import com.byt3.byaudio.model.objrelation.CollectionWithSongs;
 
 import java.util.List;
 

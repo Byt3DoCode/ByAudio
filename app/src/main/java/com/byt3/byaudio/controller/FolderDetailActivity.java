@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.adapter.SongRecyclerAdapter;
 import com.byt3.byaudio.model.AppDatabase;
-import com.byt3.byaudio.model.CollectionSongCrossRef;
 import com.byt3.byaudio.model.Folder;
 import com.byt3.byaudio.model.Song;
 import com.byt3.byaudio.model.SongCollection;

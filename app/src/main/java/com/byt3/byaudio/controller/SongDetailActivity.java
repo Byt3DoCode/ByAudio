@@ -1,12 +1,10 @@
 package com.byt3.byaudio.controller;
 
-import static com.byt3.byaudio.utils.functions.buildFullPath;
 import static com.byt3.byaudio.utils.functions.getBitmapFromPath;
 import static com.byt3.byaudio.utils.functions.milliSecondsToTimer;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,7 +15,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.model.Song;
-import com.byt3.byaudio.utils.functions;
 
 import java.util.Objects;
 

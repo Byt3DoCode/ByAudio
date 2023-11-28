@@ -1,6 +1,5 @@
 package com.byt3.byaudio.controller.fragment;
 
-import static com.byt3.byaudio.utils.functions.MY_LOGCAT;
 import static com.byt3.byaudio.utils.functions.milliSecondsToTimer;
 
 import android.content.ComponentName;
@@ -9,7 +8,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,11 +34,9 @@ import com.byt3.byaudio.model.Song;
 import com.byt3.byaudio.model.SongCollection;
 import com.byt3.byaudio.model.objrelation.CollectionWithSongs;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -95,7 +91,6 @@ public class QueueDetailFragment extends Fragment {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .distinctUntilChanged()
-//                .map(list -> Collections.unmodifiableList(new ArrayList<>(list)))
                 .subscribe(list -> {
                     queueList = list;
                     if (queueList.size()!=0){
@@ -212,13 +207,7 @@ public class QueueDetailFragment extends Fragment {
             list[currentQueue.getCrossRefs().get(i).getCrSongOrder()] = s;
         }
         adapter.setList(Arrays.asList(list));
-//        for (Song s : currentQueue.getSongs()) {
-//            s.setAlbum(db.albumDAO().getAlbumById(s.getsAlbumId()));
-//            s.setArtist(db.artistDAO().getArtistById(s.getsArtistId()));
-//            s.setFolder(db.folderDAO().getFolderById(s.getsFolderId()));
-//        }
         adapter.setIndex(playerService.getIndex());
-//        adapter.setList(currentQueue.getSongs());
     }
 
     private void initView(View view) {
