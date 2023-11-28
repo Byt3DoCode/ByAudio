@@ -1,5 +1,0 @@
-package com.byt3.byaudio.utils;
-import android.view.View;
-public interface ItemClickListener {
-    void onClick(View view,int position,boolean isLongClick);
-}

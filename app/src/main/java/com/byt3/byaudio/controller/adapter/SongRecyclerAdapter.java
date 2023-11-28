@@ -20,6 +20,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.FolderDetailActivity;
+import com.byt3.byaudio.controller.SongDetailActivity;
 import com.byt3.byaudio.controller.fragment.PlayerFragment;
 import com.byt3.byaudio.controller.service.PlayerService;
 import com.byt3.byaudio.controller.viewholder.SongViewHolder;
@@ -68,16 +69,16 @@ public class SongRecyclerAdapter extends RecyclerView.Adapter<SongViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
-        Song obj = list.get(position);
-        assert obj != null : "object is null";
-        holder.songName.setText(functions.cleanName(obj.getName()));
-        holder.artistName.setText(obj.getArtist().getName());
-        holder.songLength.setText(functions.milliSecondsToTimer(obj.getDuration()* 1000L));
-        if (obj.getAlbum().getImage() == 0) {
+        Song song = list.get(position);
+        assert song != null : "object is null";
+        holder.songName.setText(functions.cleanName(song.getName()));
+        holder.artistName.setText(song.getArtist().getName());
+        holder.songLength.setText(functions.milliSecondsToTimer(song.getDuration()* 1000L));
+        if (song.getAlbum().getImage() == 0) {
             holder.albumCover.setImageResource(R.drawable.ic_cat);
             holder.albumCover.setBackgroundColor(context.getColor(R.color.mint));
         } else {
-            holder.albumCover.setImageBitmap(getBitmapFromPath(obj));
+            holder.albumCover.setImageBitmap(getBitmapFromPath(song));
             holder.albumCover.setBackgroundColor(context.getColor(R.color.gray));
         }
         holder.itemView.setOnClickListener(view -> {
@@ -112,12 +113,11 @@ public class SongRecyclerAdapter extends RecyclerView.Adapter<SongViewHolder> {
             if (context instanceof FolderDetailActivity)
                 ((FolderDetailActivity) context).finish();
         });
-        holder.optionButton.setVisibility(View.GONE);
-//        holder.optionButton.setOnClickListener(view -> {
-//            Intent intent=new Intent(context, SongDetailActivity.class);
-//            intent.putExtra("object",obj);
-//            context.startActivity(intent);
-//        });
+        holder.optionButton.setOnClickListener(view -> {
+            Intent intent = new Intent(context, SongDetailActivity.class);
+            intent.putExtra("song",song);
+            context.startActivity(intent);
+        });
     }
 
     @Override

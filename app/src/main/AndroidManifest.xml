@@ -34,6 +34,11 @@
             android:exported="true"
             android:parentActivityName=".controller.MainActivity">
         </activity>
+        <activity
+            android:name=".controller.SongDetailActivity"
+            android:exported="true"
+            android:parentActivityName=".controller.MainActivity">
+        </activity>
         <service
             android:name=".controller.service.PlayerService"
             android:foregroundServiceType="mediaPlayback"
