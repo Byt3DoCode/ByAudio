@@ -5,20 +5,15 @@ import static com.byt3.byaudio.utils.functions.cleanName;
 import static com.byt3.byaudio.utils.functions.getBitmapFromPath;
 import static com.byt3.byaudio.utils.functions.milliSecondsToTimer;
 
-import android.app.ActivityManager;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,47 +25,61 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 import com.byt3.byaudio.R;
-import com.byt3.byaudio.controller.MainActivity;
+import com.byt3.byaudio.controller.SongDetailActivity;
 import com.byt3.byaudio.controller.service.PlayerService;
-import com.byt3.byaudio.model.AppDatabase;
 import com.byt3.byaudio.model.Song;
-import com.byt3.byaudio.utils.functions;
-
-import java.io.IOException;
-import java.util.Objects;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.Disposable;
+import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 public class PlayerFragment extends Fragment {
     ImageView albumCover;
     TextView songName, artistName, currentTime, totalDuration;
     SeekBar seekBar;
-    ImageButton songDetail, pausePlay, forward, rewind, nextSong, previousSong;
+    ImageButton songDetail, pausePlay, forward, rewind, nextSong, previousSong, repeatMode;
     Context context;
     Song currentSong;
+    Observer<Song> songObserver = new Observer<Song>() {
+        @Override
+        public void onChanged(Song song) {
+            currentSong = song;
+            handleLayout(currentSong);
+            startPlayProgressUpdater();
+        }
+    };
+    Observer<Boolean> isPlayingObserver = new Observer<Boolean>() {
+        @Override
+        public void onChanged(Boolean b) {
+            if (b) {
+                pausePlay.setImageResource(R.drawable.ic_pause_24);
+                startPlayProgressUpdater();
+            } else {
+                pausePlay.setImageResource(R.drawable.ic_play_24);
+            }
+        }
+    };
     PlayerService playerService;
     boolean isServiceConnected;
     ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Log.d(MY_LOGCAT,"in service connected ");
             PlayerService.MyBinder binder = (PlayerService.MyBinder) iBinder;
             playerService = binder.getplayerService();
+            playerService.songLiveData.observe(PlayerFragment.this, songObserver);
+            playerService.isPlayingLiveData.observe(PlayerFragment.this, isPlayingObserver);
             if (playerService.hasStarted()){
                 currentSong = playerService.getSong();
                 handleLayout(currentSong);
                 startPlayProgressUpdater();
-            }
+            } else
+                playSongFromMemory();
             isServiceConnected = true;
         }
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            Log.d(MY_LOGCAT,"in service disconnected");
             isServiceConnected = false;
         }
     };
@@ -79,6 +88,14 @@ public class PlayerFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+        String json = sharedPreferences.getString("song", "");
+        currentSong = new Gson().fromJson(json, Song.class);
     }
 
     @Nullable
@@ -122,23 +139,43 @@ public class PlayerFragment extends Fragment {
             if (playerService.getMediaPlayer() != null)
                 playerService.rewind();
         });
+        songDetail.setOnClickListener(view16 -> {
+            if (currentSong != null) {
+                Intent intent = new Intent(context, SongDetailActivity.class);
+                intent.putExtra("song", (Parcelable) currentSong);
+                context.startActivity(intent);
+            }
+        });
+        repeatMode.setOnClickListener(view17 -> {
+            Log.d(MY_LOGCAT, String.valueOf(playerService.getRepeatMode()));
+            switch (playerService.getRepeatMode()){
+                case PlayerService.REPEAT_OFF:
+                    playerService.setRepeatMode(PlayerService.REPEAT_ONE);
+                    repeatMode.setImageResource(R.drawable.ic_repeat_one_on_24);
+                    break;
+                case PlayerService.REPEAT_ONE:
+                    playerService.setRepeatMode(PlayerService.REPEAT_ALL);
+                    repeatMode.setImageResource(R.drawable.ic_repeat_on_24);
+                    break;
+                case PlayerService.REPEAT_ALL:
+                    playerService.setRepeatMode(PlayerService.REPEAT_OFF);
+                    repeatMode.setImageResource(R.drawable.ic_repeat_24);
+                    break;
+            }
+        });
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if(playerService.getMediaPlayer() != null && b){
+                if(playerService.getMediaPlayer() != null && b)
                     playerService.getMediaPlayer().seekTo(i);
-                }
             }
-
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if(playerService.getMediaPlayer() != null){
+                if(playerService.getMediaPlayer() != null)
                     playerService.getMediaPlayer().seekTo(seekBar.getProgress());
-                }
             }
         });
         return view;
@@ -163,29 +200,33 @@ public class PlayerFragment extends Fragment {
         totalDuration = view.findViewById(R.id.totalTime);
         seekBar = view.findViewById(R.id.slider);
         songDetail = view.findViewById(R.id.songDetail);
-        songDetail.setVisibility(View.INVISIBLE);
         pausePlay = view.findViewById(R.id.pausePlay);
         forward = view.findViewById(R.id.fastForward);
         rewind = view.findViewById(R.id.fastRewind);
         nextSong = view.findViewById(R.id.nextSong);
         previousSong = view.findViewById(R.id.previousSong);
+        repeatMode = view.findViewById(R.id.repeatSetting);
     }
 
     private void handleLayout(Song song) {
+        currentTime.setText(milliSecondsToTimer(0));
         songName.setText(cleanName(song.getName()));
+        songName.setSelected(true);
         artistName.setText(song.getArtist().getName());
         totalDuration.setText(milliSecondsToTimer(song.getDuration()* 1000L));
         seekBar.setMax(song.getDuration() * 1000);
         if (song.getAlbum().getImage() == 1){
             Bitmap bm = getBitmapFromPath(song);
             albumCover.setImageBitmap(bm);
+        } else if (song.getAlbum().getImage() == 2) {
+            Picasso.get().load(song.getAlbum().getUrl()).into(albumCover);
         } else
             albumCover.setImageResource(R.drawable.ic_cat);
+        SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString("Song", new Gson().toJson(currentSong)).apply();
     }
 
-    public void startPlayProgressUpdater() {
-        if (playerService.getSong() != currentSong)
-            handleLayout(playerService.getSong());
+    private void startPlayProgressUpdater() {
         long currentDuration = playerService.getMediaPlayer().getCurrentPosition();
         seekBar.setProgress((int) currentDuration);
         String s = milliSecondsToTimer(currentDuration);
@@ -194,5 +235,11 @@ public class PlayerFragment extends Fragment {
             Runnable notification = this::startPlayProgressUpdater;
             seekBar.postDelayed(notification,1000);
         }
+    }
+
+    private void playSongFromMemory(){
+        SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+        String json = sharedPreferences.getString("song", "");
+        currentSong = new Gson().fromJson(json, Song.class);
     }
 }

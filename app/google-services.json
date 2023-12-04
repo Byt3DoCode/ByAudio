@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "317676145214",
+    "project_id": "streammusic-7ed2d",
+    "storage_bucket": "streammusic-7ed2d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:317676145214:android:975f5c0716e3d890249f6f",
+        "android_client_info": {
+          "package_name": "com.byt3.byaudio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzhUgzcYn_A-hyqSJaCb0Si3VhLEXkiSg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

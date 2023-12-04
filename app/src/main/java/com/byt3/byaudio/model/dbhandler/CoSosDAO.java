@@ -36,4 +36,7 @@ public interface CoSosDAO {
     @Transaction
     @Update
     void updateCollectionSongCrossRef(CollectionSongCrossRef collectionSongCrossRef);
+    @Transaction
+    @Update
+    void updateAllCrossRef(List<CollectionSongCrossRef> list);
 }

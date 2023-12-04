@@ -3,6 +3,7 @@ package com.byt3.byaudio.controller.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,7 +90,7 @@ public class PlaylistMenuFragment extends Fragment {
             builderSingle.setNegativeButton("cancel", (dialog, which) -> dialog.dismiss());
             builderSingle.setAdapter(arrayAdapter, (dialog, which) -> {
                 Intent intent = new Intent(context, FolderDetailActivity.class);
-                intent.putExtra("folder", folders.get(which));
+                intent.putExtra("folder", (Parcelable) folders.get(which));
                 startActivity(intent);
             });
             builderSingle.show();

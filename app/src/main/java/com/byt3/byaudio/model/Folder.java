@@ -9,8 +9,10 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity
-public class Folder implements Parcelable {
+public class Folder implements Parcelable, Serializable {
     @PrimaryKey(autoGenerate = true)
     private int folderId;
     @ColumnInfo(name = "folder_name")
@@ -24,6 +26,12 @@ public class Folder implements Parcelable {
 
     @Ignore
     public Folder(String path) {
+        this.path = path;
+    }
+
+    @Ignore
+    public Folder(String name, String path) {
+        this.name = name;
         this.path = path;
     }
 

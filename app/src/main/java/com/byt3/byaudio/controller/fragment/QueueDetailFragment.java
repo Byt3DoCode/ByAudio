@@ -4,6 +4,7 @@ import static com.byt3.byaudio.utils.functions.milliSecondsToTimer;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -20,6 +21,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,7 +31,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.byt3.byaudio.R;
 import com.byt3.byaudio.controller.adapter.QueueDetailRecyclerAdapter;
+import com.byt3.byaudio.controller.adapter.QueueRecyclerAdapter;
 import com.byt3.byaudio.controller.service.PlayerService;
+import com.byt3.byaudio.controller.viewholder.DraggableSongViewHolder;
 import com.byt3.byaudio.model.AppDatabase;
 import com.byt3.byaudio.model.CollectionSongCrossRef;
 import com.byt3.byaudio.model.Song;
@@ -50,7 +56,14 @@ public class QueueDetailFragment extends Fragment {
     Button saveBtn, nameBtn;
     QueueDetailRecyclerAdapter adapter;
     List<CollectionWithSongs> queueList;
+    MutableLiveData<List<CollectionWithSongs>> collectionsLiveData = new MutableLiveData<>();
     CollectionWithSongs currentQueue;
+    Observer<Integer> indexObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer integer) {
+            adapter.setIndex(integer);
+        }
+    };
     CompositeDisposable disposable;
     PlayerService playerService;
     boolean isServiceConnected;
@@ -58,8 +71,10 @@ public class QueueDetailFragment extends Fragment {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             PlayerService.MyBinder binder = (PlayerService.MyBinder) iBinder;
-            playerService = binder.getplayerService();
             isServiceConnected = true;
+            playerService = binder.getplayerService();
+            playerService.indexLiveData.observe(QueueDetailFragment.this, indexObserver);
+            collectionsLiveData.observe(QueueDetailFragment.this, playerService.collectionsObserver);
             setupSongCollection();
         }
         @Override
@@ -115,6 +130,21 @@ public class QueueDetailFragment extends Fragment {
                 setupSongCollection();
             });
             builderSingle.show();
+
+//            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//            LayoutInflater inflater2 = getLayoutInflater();
+//            View dialogView = (View) inflater2.inflate(R.layout.custom_alert_dialog, null);
+//            RecyclerView rv = (RecyclerView) dialogView.findViewById(R.id.alertRecyclerView);
+//            QueueRecyclerAdapter queueAdapter = new QueueRecyclerAdapter(context, queueList, getActivity());
+//            rv.setAdapter(queueAdapter);
+//            builder.setView(dialogView);
+//            builder.setNegativeButton("done", (dialogInterface, i) -> {
+//                dialogInterface.dismiss();
+//                currentQueue = queueList.get(queueAdapter.getIndex());
+//                setupSongCollection();
+//            });
+//            AlertDialog dialog = builder.create();
+//            dialog.show();
         });
 
         saveBtn.setOnClickListener(view12 -> {
@@ -145,14 +175,16 @@ public class QueueDetailFragment extends Fragment {
                 int toPos = target.getAdapterPosition();
                 CollectionSongCrossRef fromCrossRef = currentQueue.getCrossRefs().get(fromPos);
                 CollectionSongCrossRef toCrossRef = currentQueue.getCrossRefs().get(toPos);
+
                 int fromIndex = fromCrossRef.getCrSongOrder();
                 int toIndex = toCrossRef.getCrSongOrder();
                 fromCrossRef.setCrSongOrder(-1);
-                toCrossRef.setCrSongOrder(fromIndex);
                 db.CoSosDAO().updateCollectionSongCrossRef(fromCrossRef);
+                toCrossRef.setCrSongOrder(fromIndex);
                 db.CoSosDAO().updateCollectionSongCrossRef(toCrossRef);
                 fromCrossRef.setCrSongOrder(toIndex);
                 db.CoSosDAO().updateCollectionSongCrossRef(fromCrossRef);
+
                 Collections.swap(currentQueue.songs, fromPos, toPos);
                 Collections.swap(currentQueue.crossRefs, fromPos, toPos);
                 adapter.setListSilent(currentQueue.getSongs());
@@ -164,15 +196,24 @@ public class QueueDetailFragment extends Fragment {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int queuePos = queueList.indexOf(currentQueue);
-                CollectionSongCrossRef crossRef = new CollectionSongCrossRef(
+                CollectionSongCrossRef swipedCrossRef = new CollectionSongCrossRef(
                         currentQueue.getSongCollection().getScId(),
                         currentQueue.getSongs()
                                 .get(viewHolder.getLayoutPosition())
                                 .getSongId(),
                         viewHolder.getLayoutPosition());
-                db.CoSosDAO().deleteCrossRef(crossRef);
+                db.CoSosDAO().deleteCrossRef(swipedCrossRef);
+
                 currentQueue.songs.remove(viewHolder.getLayoutPosition());
                 currentQueue.crossRefs.remove(viewHolder.getLayoutPosition());
+                currentQueue.calculateSizeAndDuration();
+
+                for (CollectionSongCrossRef crossRef : currentQueue.crossRefs)
+                    if (crossRef.getCrSongOrder() > viewHolder.getLayoutPosition())
+                        crossRef.setCrSongOrder(crossRef.getCrSongOrder() - 1);
+
+                db.CoSosDAO().updateAllCrossRef(currentQueue.crossRefs);
+
                 adapter.setListSilent(currentQueue.getSongs());
                 adapter.notifyItemRangeRemoved(viewHolder.getLayoutPosition(), 1);
                 queueList.set(queuePos, currentQueue);
@@ -199,7 +240,7 @@ public class QueueDetailFragment extends Fragment {
         sizeText.setText(size);
         durationText.setText(milliSecondsToTimer(currentQueue.getSongCollection().getScTotalDuration()*1000L));
         Song[] list = new Song[currentQueue.getSongCollection().getScSize()];
-        for (int i = 0; i < currentQueue.getCrossRefs().size(); ++i) {
+        for (int i = 0; i < currentQueue.getSongCollection().getScSize(); ++i) {
             Song s = currentQueue.getSongs().get(i);
             s.setAlbum(db.albumDAO().getAlbumById(s.getsAlbumId()));
             s.setArtist(db.artistDAO().getArtistById(s.getsArtistId()));

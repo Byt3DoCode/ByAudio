@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.byt3.byaudio.R;
-import com.byt3.byaudio.controller.adapter.ViewPagerAdapter;
+import com.byt3.byaudio.controller.adapter.FragmentViewPagerAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         viewPager = findViewById(R.id.viewpager);
 
-        ViewPagerAdapter adapter = new ViewPagerAdapter(this, 5);
+        FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(this, 5);
         viewPager.setAdapter(adapter);
         viewPager.setUserInputEnabled(true);
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {

@@ -47,4 +47,14 @@ public class CollectionWithSongs {
     public List<CollectionSongCrossRef> getCrossRefs() {
         return crossRefs;
     }
+
+    public void calculateSizeAndDuration() {
+        int size = 0, duration = 0;
+        for (Song s : songs) {
+            ++size;
+            duration += s.getDuration();
+        }
+        songCollection.setScSize(size);
+        songCollection.setScTotalDuration(duration);
+    }
 }

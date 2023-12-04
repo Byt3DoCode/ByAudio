@@ -50,29 +50,31 @@ public class SearchLocalFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (!query.equals("")){
-//                    List<SongAndArtistAndAlbumAndFolder> list = db.saafDAO().getSAAFBySongName("%"+query+"%");
-                    InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                    songs = db.songDAO().getSongLikeName("%"+query+"%");
-                    for (Song s : songs) {
-                        s.setArtist(db.artistDAO().getArtistById(s.sArtistId));
-                        s.setAlbum(db.albumDAO().getAlbumById(s.sAlbumId));
-                        s.setFolder(db.folderDAO().getFolderById(s.sFolderId));
-                    }
-                    songAdapter.setQueryText(query);
-                    songAdapter.setList(songs);
-                }
+//                List<SongAndArtistAndAlbumAndFolder> list = db.saafDAO().getSAAFBySongName("%"+query+"%");
+                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                searchSong(query);
                 return true;
             }
             @Override
             public boolean onQueryTextChange(String newText) {
-                return false;
+                if (!newText.trim().equals("") && newText.length() >= 3)
+                    searchSong(newText);
+                return true;
             }
         });
         return view;
     }
-
+    private void searchSong(String text) {
+        songs = db.songDAO().getSongLikeName("%"+text+"%");
+        for (Song s : songs) {
+            s.setArtist(db.artistDAO().getArtistById(s.sArtistId));
+            s.setAlbum(db.albumDAO().getAlbumById(s.sAlbumId));
+            s.setFolder(db.folderDAO().getFolderById(s.sFolderId));
+        }
+        songAdapter.setQueryText(text);
+        songAdapter.setList(songs);
+    }
     private void initView(View view) {
         searchView = view.findViewById(R.id.searchBar);
         recyclerView = view.findViewById(R.id.recyclerView);

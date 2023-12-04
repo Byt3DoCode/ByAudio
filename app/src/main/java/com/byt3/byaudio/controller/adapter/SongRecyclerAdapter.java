@@ -5,6 +5,7 @@ import static com.byt3.byaudio.utils.functions.getBitmapFromPath;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,7 +109,7 @@ public class SongRecyclerAdapter extends RecyclerView.Adapter<SongViewHolder> {
         });
         holder.optionButton.setOnClickListener(view -> {
             Intent intent = new Intent(context, SongDetailActivity.class);
-            intent.putExtra("song",song);
+            intent.putExtra("song", (Parcelable) song);
             context.startActivity(intent);
         });
     }

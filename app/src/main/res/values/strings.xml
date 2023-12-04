@@ -14,4 +14,5 @@
     <string name="slider_description">slider</string>
     <string name="imageView_albumCover_description">No Album Cover</string>
     <string name="button_player_controller_description">media player controller</string>
+    <string name="repeat_button_description">repeat setting button</string>
 </resources>

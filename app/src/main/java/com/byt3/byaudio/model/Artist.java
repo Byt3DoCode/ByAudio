@@ -9,8 +9,10 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity
-public class Artist implements Parcelable {
+public class Artist implements Parcelable, Serializable {
     @PrimaryKey(autoGenerate = true)
     int artistId;
     @ColumnInfo(name = "artist_name")

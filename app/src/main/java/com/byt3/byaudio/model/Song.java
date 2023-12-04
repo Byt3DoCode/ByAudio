@@ -11,6 +11,8 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(foreignKeys = {@ForeignKey(entity = Artist.class, parentColumns = "artistId", childColumns = "sArtistId", onDelete = ForeignKey.CASCADE),
         @ForeignKey(entity = Album.class, parentColumns = "albumId", childColumns = "sAlbumId", onDelete = ForeignKey.CASCADE),
         @ForeignKey(entity = Folder.class, parentColumns = "folderId", childColumns = "sFolderId", onDelete = ForeignKey.CASCADE)},
@@ -19,7 +21,7 @@ import androidx.room.PrimaryKey;
                 @Index("sAlbumId"),
                 @Index(value = {"sFolderId", "song_name"}, unique = true)
         })
-public class Song implements Parcelable {
+public class Song implements Parcelable, Serializable {
     @PrimaryKey(autoGenerate = true)
     int songId;
     @ColumnInfo(name = "song_name")
@@ -42,6 +44,11 @@ public class Song implements Parcelable {
     public Song(String name, Folder folder){
         this.name = name;
         this.folder = folder;
+    }
+    @Ignore
+    public Song(String name, int duration){
+        this.name = name;
+        this.duration = duration;
     }
 
     @Ignore
